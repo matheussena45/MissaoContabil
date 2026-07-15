@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Empresário em Ação</title>
+<link rel="stylesheet" href="style.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.70.0/phaser.min.js"></script>
+</head>
+<body>
+
+  <div id="game-wrapper">
+    <div id="game-container"></div>
+
+    <!-- HUD -->
+    <div id="hud">
+      <div id="hud-lives">❤️❤️❤️</div>
+      <div id="hud-score">🪙 <span id="score-value">0</span></div>
+      <div id="hud-phase">Fase <span id="phase-value">1</span>/3</div>
+    </div>
+
+    <!-- Caixa de informação (murais/quadros) -->
+    <div id="info-bubble" class="hidden">
+      <div class="info-bubble-content"></div>
+    </div>
+
+    <!-- Overlay de batalha do boss (PAUSA o jogo) — estilo caixa de diálogo RPG -->
+    <div id="boss-overlay" class="hidden">
+      <div class="dialogue-box">
+        <div class="dialogue-portrait">
+          <div class="portrait-frame">🧑‍💼</div>
+          <h2 id="boss-name">BOSS</h2>
+        </div>
+        <div class="dialogue-content">
+          <div class="dialogue-header">
+            <span>⏱ <span id="boss-timer">30</span>s</span>
+          </div>
+          <p id="question-text">Pergunta?</p>
+          <div id="question-options"></div>
+          <div id="question-feedback" class="hidden"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tela final (vitória ou derrota) -->
+    <div id="end-overlay" class="hidden">
+      <div class="end-panel">
+        <h2 id="end-title">Fim de Jogo</h2>
+        <p id="end-message"></p>
+        <div id="end-score"></div>
+        <div id="end-buttons">
+          <button id="view-ranking-btn">Ver ranking</button>
+          <button id="restart-btn">Jogar novamente</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Ranking (acessível a partir da tela final) -->
+    <div id="ranking-overlay" class="hidden">
+      <div class="ranking-panel">
+        <h2>🏆 Ranking Top 10</h2>
+        <div id="ranking-list-content"></div>
+        <button id="close-ranking-btn">Fechar</button>
+      </div>
+    </div>
+
+    <!-- ================= MENU INICIAL ================= -->
+    <div id="start-overlay">
+      <div class="menu-wrapper">
+
+        <!-- MENU PRINCIPAL -->
+        <div id="panel-menu" class="menu-panel">
+          <h1>Empresário em Ação</h1>
+          <p class="tagline">Uma aventura sobre abrir e organizar sua empresa.</p>
+          <div class="menu-buttons">
+            <button class="menu-btn menu-btn-play" data-target="panel-name">▶ Jogar</button>
+            <button class="menu-btn" data-target="panel-ranking">🏆 Ranking</button>
+            <button class="menu-btn" data-target="panel-rules">📋 Regras</button>
+            <button class="menu-btn" data-target="panel-empresa">🏢 Sobre a Empresa</button>
+            <button class="menu-btn" data-target="panel-criador">👤 Criador</button>
+          </div>
+        </div>
+
+        <!-- NOME DO JOGADOR (aparece ao clicar em Jogar) -->
+        <div id="panel-name" class="menu-panel hidden">
+          <h2>Antes de começar...</h2>
+          <label for="player-name-start">Como podemos te chamar?</label>
+          <input id="player-name-start" type="text" maxlength="24" placeholder="Digite seu nome" autocomplete="off" />
+          <p id="name-warning" class="hidden">Digite seu nome antes de começar 🙂</p>
+          <div class="panel-actions">
+            <button id="confirm-name-btn">Confirmar e Jogar</button>
+            <button class="back-btn" data-target="panel-menu">Voltar</button>
+          </div>
+        </div>
+
+        <!-- RANKING -->
+        <div id="panel-ranking" class="menu-panel hidden">
+          <h2>🏆 Ranking Top 10</h2>
+          <div id="ranking-list-menu"></div>
+          <button class="back-btn" data-target="panel-menu">Voltar</button>
+        </div>
+
+        <!-- REGRAS -->
+        <div id="panel-rules" class="menu-panel hidden">
+          <h2>📋 Como jogar</h2>
+          <ul>
+            <li><strong>Mover:</strong> setas ← → (ou A/D)</li>
+            <li><strong>Pular:</strong> seta ↑ (ou W)</li>
+            <li><strong>Abaixar:</strong> seta ↓ (ou S)</li>
+            <li><strong>Objetivo:</strong> avance pelas 3 fases, leia os murais pelo caminho e vença os desafiadores no final de cada fase.</li>
+            <li><strong>Perguntas e chefes:</strong> ao chegar no chefe, o jogo pausa e aparecem 3 perguntas sorteadas sobre o tema da fase.</li>
+            <li><strong>Como vencer:</strong> complete as 3 fases sem ficar sem vidas.</li>
+            <li><strong>Como perder:</strong> errar respostas custa vidas — ficar com 0 vidas encerra a aventura.</li>
+            <li><strong>Pontuação:</strong> baseada em respostas certas, vidas restantes e tempo total. Explorar os murais não pontua — é só pra aprender!</li>
+          </ul>
+          <button class="back-btn" data-target="panel-menu">Voltar</button>
+        </div>
+
+        <!-- SOBRE A EMPRESA -->
+        <div id="panel-empresa" class="menu-panel hidden">
+          <h2>🏢 Sobre a Empresa</h2>
+          <p><em>EDITAR AQUI:</em> Nome do escritório de contabilidade, breve descrição da atuação, missão e diferenciais. Ex.: "A [Nome] Contabilidade ajuda empresários a organizarem suas empresas com clareza e segurança há X anos."</p>
+          <button class="back-btn" data-target="panel-menu">Voltar</button>
+        </div>
+
+        <!-- CRIADOR -->
+        <div id="panel-criador" class="menu-panel hidden">
+          <h2>👤 Criador</h2>
+          <p><em>EDITAR AQUI:</em> Seu nome, seu papel na criação do jogo e uma frase curta sobre a motivação do projeto.</p>
+          <button class="back-btn" data-target="panel-menu">Voltar</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
