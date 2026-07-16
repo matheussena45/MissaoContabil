@@ -14,9 +14,23 @@
 
     <!-- HUD -->
     <div id="hud">
-      <div id="hud-lives">❤️❤️❤️</div>
-      <div id="hud-score">🪙 <span id="score-value">0</span></div>
-      <div id="hud-phase">Fase <span id="phase-value">1</span>/3</div>
+      <div id="hud-left" class="hud-card">
+        <div class="hud-card-top">
+          <img id="hud-character-icon" src="assets/thumbnails/city_men_1.png" alt="Personagem" />
+          <div id="hud-lives">❤️❤️❤️</div>
+        </div>
+        <div class="hud-card-row">🪙 <span id="score-value">0</span></div>
+        <div class="hud-card-row hud-small">Fase <span id="phase-value">1</span>/3 · 📖 <span id="hud-murais-count">0</span>/<span id="hud-murais-total">3</span></div>
+      </div>
+
+      <div id="hud-right" class="hud-card hud-progress-card">
+        <div class="hud-progress-label">🚩 Rumo ao chefe</div>
+        <div class="hud-progress-track">
+          <div id="hud-progress-fill"></div>
+          <div id="hud-progress-marker">🧍</div>
+          <div class="hud-progress-boss-marker">💀</div>
+        </div>
+      </div>
     </div>
 
     <!-- Caixa de informação (murais/quadros) -->
@@ -24,21 +38,19 @@
       <div class="info-bubble-content"></div>
     </div>
 
-    <!-- Overlay de batalha do boss (PAUSA o jogo) — estilo caixa de diálogo RPG -->
+    <!-- Overlay de batalha do boss (PAUSA o jogo) -->
     <div id="boss-overlay" class="hidden">
-      <div class="dialogue-box">
-        <div class="dialogue-portrait">
-          <div class="portrait-frame">🧑‍💼</div>
-          <h2 id="boss-name">BOSS</h2>
-        </div>
-        <div class="dialogue-content">
-          <div class="dialogue-header">
-            <span>⏱ <span id="boss-timer">30</span>s</span>
-          </div>
-          <p id="question-text">Pergunta?</p>
-          <div id="question-options"></div>
-          <div id="question-feedback" class="hidden"></div>
-        </div>
+      <!-- Balão da pergunta: flutua acima da cabeça do boss -->
+      <div id="boss-dialogue" class="boss-dialogue">
+        <div class="dialogue-badge" id="dialogue-header">⏱ 30s</div>
+        <div class="boss-name-tag" id="boss-name">BOSS</div>
+        <p id="question-text" class="question-bubble">Pergunta?</p>
+      </div>
+
+      <!-- Painel de respostas: fixo do lado esquerdo da tela -->
+      <div id="boss-answers-panel" class="boss-answers-panel hidden">
+        <div id="question-options"></div>
+        <div id="question-feedback" class="hidden"></div>
       </div>
     </div>
 
@@ -81,9 +93,23 @@
           </div>
         </div>
 
-        <!-- NOME DO JOGADOR (aparece ao clicar em Jogar) -->
+        <!-- ESCOLHA DE PERSONAGEM + NOME (aparece ao clicar em Jogar) -->
         <div id="panel-name" class="menu-panel hidden">
           <h2>Antes de começar...</h2>
+
+          <label>Escolha seu personagem</label>
+          <div id="character-select" class="character-grid">
+            <button class="character-option selected" data-character="city_men_1">
+              <img src="assets/thumbnails/city_men_1.png" alt="Personagem 1" />
+            </button>
+            <button class="character-option" data-character="city_girl_1">
+              <img src="assets/thumbnails/city_girl_1.png" alt="Personagem 2" />
+            </button>
+            <button class="character-option" data-character="city_men_3">
+              <img src="assets/thumbnails/city_men_3.png" alt="Personagem 3" />
+            </button>
+          </div>
+
           <label for="player-name-start">Como podemos te chamar?</label>
           <input id="player-name-start" type="text" maxlength="24" placeholder="Digite seu nome" autocomplete="off" />
           <p id="name-warning" class="hidden">Digite seu nome antes de começar 🙂</p>
@@ -105,8 +131,6 @@
           <h2>📋 Como jogar</h2>
           <ul>
             <li><strong>Mover:</strong> setas ← → (ou A/D)</li>
-            <li><strong>Pular:</strong> seta ↑ (ou W)</li>
-            <li><strong>Abaixar:</strong> seta ↓ (ou S)</li>
             <li><strong>Objetivo:</strong> avance pelas 3 fases, leia os murais pelo caminho e vença os desafiadores no final de cada fase.</li>
             <li><strong>Perguntas e chefes:</strong> ao chegar no chefe, o jogo pausa e aparecem 3 perguntas sorteadas sobre o tema da fase.</li>
             <li><strong>Como vencer:</strong> complete as 3 fases sem ficar sem vidas.</li>

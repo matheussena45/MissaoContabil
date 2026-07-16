@@ -3,7 +3,7 @@
 //
 // COMO PERSONALIZAR:
 //  - Cores da marca: editar THEME (abaixo) + :root em style.css (manter os dois sincronizados)
-//  - Pixel art do personagem: editar PLAYER_FRAMES (grids de pixels)
+//  - Personagens jogáveis: editar CHARACTERS (abaixo) + arquivos em assets/characters/<id>/
 //  - Fases, murais e perguntas: editar PHASES
 //  - Textos "Sobre o escritório" / "Sobre o criador": editar diretamente no index.html
 // =========================================================
@@ -11,6 +11,8 @@
 const RANKING_KEY = 'empresario_ranking_v1';
 const MAX_LIVES = 3;
 const INFO_PROXIMITY_RADIUS = 90; // px — raio em que o mural fica visível
+const READING_SECONDS = 5; // tempo em que só a pergunta aparece (boss "falando"), sem alternativas
+const ANSWER_SECONDS = 30;  // tempo pra responder depois que as alternativas aparecem
 
 // ---------------------------------------------------------
 // TEMA / IDENTIDADE VISUAL (deve bater com :root em style.css)
@@ -29,10 +31,28 @@ const THEME = {
 };
 
 // ---------------------------------------------------------
+// PERSONAGENS JOGÁVEIS
+// Para adicionar um novo (ex: uma variação mulher), basta:
+//  1. Colocar Idle.png e Walk.png em assets/characters/<id>/
+//  2. Colocar uma miniatura em assets/thumbnails/<id>.png
+//  3. Adicionar uma entrada aqui + um botão em index.html (#character-select)
+// ---------------------------------------------------------
+const CHARACTERS = [
+  { id: 'city_men_1', label: 'Personagem 1', idleFrames: 6, walkFrames: 10 },
+  { id: 'city_girl_1', label: 'Personagem 2', idleFrames: 6, walkFrames: 10 },
+  { id: 'city_men_3', label: 'Personagem 3', idleFrames: 6, walkFrames: 10 },
+];
+const CHARACTER_FRAME_SIZE = 128;
+// Hitbox real do personagem dentro do frame 128x128 (o resto é espaço transparente)
+const CHARACTER_BODY = { width: 44, height: 70, offsetX: 42, offsetY: 58 };
+const CHARACTER_SCALE = 2.2; // aumenta/diminui o tamanho do personagem em tela
+
+// ---------------------------------------------------------
 // ESTADO GLOBAL DO JOGO (sobrevive entre trocas de fase/cena)
 // ---------------------------------------------------------
 const GameData = {
   playerName: 'Empresário',
+  selectedCharacter: CHARACTERS[0].id,
   lives: MAX_LIVES,
   score: 0,
   phaseIndex: 0,
@@ -147,6 +167,21 @@ function updateHUD() {
   document.getElementById('phase-value').textContent = GameData.phaseIndex + 1;
 }
 
+// Conta quantos murais da fase atual já foram vistos (só estatística/flavor, não pontua)
+function updateMuraisCounter(phaseId, total) {
+  let count = 0;
+  GameData.infosSeen.forEach((id) => { if (id.startsWith(`${phaseId}_`)) count += 1; });
+  document.getElementById('hud-murais-count').textContent = count;
+  document.getElementById('hud-murais-total').textContent = total;
+}
+
+// Move o marcador do mini indicador "rumo ao chefe" conforme o jogador avança na fase
+function updateBossProgress(playerX, levelWidth) {
+  const pct = Math.min(100, Math.max(0, (playerX / levelWidth) * 100));
+  document.getElementById('hud-progress-fill').style.width = `${pct}%`;
+  document.getElementById('hud-progress-marker').style.left = `${pct}%`;
+}
+
 function loadRanking() {
   try { return JSON.parse(localStorage.getItem(RANKING_KEY)) || []; }
   catch (e) { return []; }
@@ -206,16 +241,16 @@ function formatMessageForScore(score) {
 class KeyboardInputProvider {
   constructor(scene) {
     this.cursors = scene.input.keyboard.createCursorKeys();
-    this.keys = scene.input.keyboard.addKeys({ W: 'W', A: 'A', S: 'S', D: 'D' });
+    this.keys = scene.input.keyboard.addKeys({ A: 'A', D: 'D' });
   }
   isLeft() { return this.cursors.left.isDown || this.keys.A.isDown; }
   isRight() { return this.cursors.right.isDown || this.keys.D.isDown; }
-  isJump() { return this.cursors.up.isDown || this.keys.W.isDown; }
-  isDuck() { return this.cursors.down.isDown || this.keys.S.isDown; }
 }
 
 // TODO (futuro): class TouchInputProvider { ... }  -> botões on-screen
 // TODO (futuro): class GamepadInputProvider { ... } -> this.scene.input.gamepad
+// TODO (futuro): se pular/agachar voltarem a fazer sentido (ex: obstáculos), reintroduzir
+// isJump()/isDuck() aqui e no InputManager abaixo — a arquitetura já está pronta pra isso.
 
 class InputManager {
   constructor(scene) {
@@ -225,8 +260,6 @@ class InputManager {
   setEnabled(v) { this.enabled = v; }
   left() { return this.enabled && this.providers.some((p) => p.isLeft()); }
   right() { return this.enabled && this.providers.some((p) => p.isRight()); }
-  jump() { return this.enabled && this.providers.some((p) => p.isJump()); }
-  duck() { return this.enabled && this.providers.some((p) => p.isDuck()); }
 }
 
 // ---------------------------------------------------------
@@ -248,40 +281,6 @@ function drawPixelTexture(scene, key, rows, palette, pixelSize) {
   g.generateTexture(key, width * pixelSize, height * pixelSize);
   g.destroy();
 }
-
-const PLAYER_PALETTE = { H: THEME.hair, F: THEME.skin, S: THEME.primary, T: THEME.accent, P: THEME.primaryDark, B: THEME.shoe };
-
-// Grid 10x15 — "empresário" de terno azul-marinho e gravata dourada
-const PLAYER_FRAMES = {
-  idle: [
-    '.HHHHHHHH.', '.HHHHHHHH.', '.FFFFFFFF.', '.FFFFFFFF.',
-    '.SSSSSSSS.', '.SSSTTSSS.', '.SSSTTSSS.', '.SSSTTSSS.',
-    '.SSSSSSSS.', '.SSSSSSSS.', '.PPPPPPPP.', '.PPPPPPPP.',
-    '.PPPPPPPP.', '.BBB..BBB.', '.BBB..BBB.',
-  ],
-  walk1: [
-    '.HHHHHHHH.', '.HHHHHHHH.', '.FFFFFFFF.', '.FFFFFFFF.',
-    '.SSSSSSSS.', '.SSSTTSSS.', '.SSSTTSSS.', '.SSSTTSSS.',
-    '.SSSSSSSS.', '.SSSSSSSS.', '.PPPPPPPP.', '.PPPPPP...',
-    '.PPP......', '.BBB......', '...BBB....',
-  ],
-  walk2: [
-    '.HHHHHHHH.', '.HHHHHHHH.', '.FFFFFFFF.', '.FFFFFFFF.',
-    '.SSSSSSSS.', '.SSSTTSSS.', '.SSSTTSSS.', '.SSSTTSSS.',
-    '.SSSSSSSS.', '.SSSSSSSS.', '.PPPPPPPP.', '...PPPPPP.',
-    '......PPP.', '....BBB...', '......BBB.',
-  ],
-  jump: [
-    '.HHHHHHHH.', '.HHHHHHHH.', '.FFFFFFFF.', '.FFFFFFFF.',
-    'SSSSSSSSSS', 'SSSSTTSSSS', '.SSSTTSSS.', '.SSSTTSSS.',
-    '.SSSSSSSS.', '.SSSSSSSS.', '.PPPPPPPP.', '..PPPPPP..',
-    '..PPPPPP..', '..BBBBBB..', '..BBBBBB..',
-  ],
-  duck: [
-    '.HHHHHHHH.', '.FFFFFFFF.', '.SSSTTSSS.', '.SSSTTSSS.',
-    '.SSSSSSSS.', '.PPPPPPPP.', '.PPPPPPPP.', '.BBB..BBB.',
-  ],
-};
 
 const BOSS_PALETTE = { R: THEME.danger, K: 0x1a1a1a, G: 0x555555 };
 const BOSS_FRAME = [
@@ -307,11 +306,6 @@ const DOOR_FRAME = [
 
 function buildAllTextures(scene) {
   const PS = 4; // tamanho do "pixel" em px reais
-  drawPixelTexture(scene, 'player_idle', PLAYER_FRAMES.idle, PLAYER_PALETTE, PS);
-  drawPixelTexture(scene, 'player_walk1', PLAYER_FRAMES.walk1, PLAYER_PALETTE, PS);
-  drawPixelTexture(scene, 'player_walk2', PLAYER_FRAMES.walk2, PLAYER_PALETTE, PS);
-  drawPixelTexture(scene, 'player_jump', PLAYER_FRAMES.jump, PLAYER_PALETTE, PS);
-  drawPixelTexture(scene, 'player_duck', PLAYER_FRAMES.duck, PLAYER_PALETTE, PS);
   drawPixelTexture(scene, 'bossTex', BOSS_FRAME, BOSS_PALETTE, PS);
   drawPixelTexture(scene, 'posterTex', POSTER_FRAME, POSTER_PALETTE, PS);
   drawPixelTexture(scene, 'doorTex', DOOR_FRAME, DOOR_PALETTE, PS);
@@ -358,16 +352,40 @@ function endGame(won) {
 // ---------------------------------------------------------
 // BATALHA DE BOSS — PAUSA o jogo (física + input) enquanto ativa
 // ---------------------------------------------------------
-function startBossBattle(scene, phaseConfig, onComplete) {
+function positionBossDialogue(scene, bossSprite) {
+  const canvas = scene.game.canvas;
+  const wrapper = document.getElementById('game-wrapper');
+  const wrapperRect = wrapper.getBoundingClientRect();
+  const scaleFactor = canvas.clientWidth / canvas.width; // canvas.width = resolução nativa (960)
+
+  const bounds = bossSprite.getBounds();
+  const scrollX = scene.cameras.main.scrollX;
+  let screenX = (bounds.centerX - scrollX) * scaleFactor;
+  const screenTopY = bounds.top * scaleFactor;
+
+  // Evita o balão sair da tela quando o boss está perto da borda direita/esquerda
+  screenX = Math.min(Math.max(screenX, 160), wrapperRect.width - 160);
+
+  const dialogueEl = document.getElementById('boss-dialogue');
+  dialogueEl.style.left = `${screenX}px`;
+  dialogueEl.style.bottom = `${wrapperRect.height - screenTopY + 26}px`;
+}
+
+function startBossBattle(scene, phaseConfig, bossSprite, onComplete) {
   const mySession = GameData.sessionId; // trava esta batalha à partida atual
   GameData.paused = true;
   scene.physics.pause();
   scene.inputManager.setEnabled(false);
 
+  positionBossDialogue(scene, bossSprite);
+  const onResize = () => positionBossDialogue(scene, bossSprite);
+  window.addEventListener('resize', onResize);
+
   const overlay = document.getElementById('boss-overlay');
   const nameEl = document.getElementById('boss-name');
-  const timerEl = document.getElementById('boss-timer');
+  const headerEl = document.getElementById('dialogue-header');
   const questionEl = document.getElementById('question-text');
+  const answersPanelEl = document.getElementById('boss-answers-panel');
   const optionsEl = document.getElementById('question-options');
   const feedbackEl = document.getElementById('question-feedback');
 
@@ -376,10 +394,12 @@ function startBossBattle(scene, phaseConfig, onComplete) {
 
   const questions = pickRandom(phaseConfig.boss.questions, 3);
   let qIndex = 0;
+  let readInterval = null;
   let timerInterval = null;
 
   function isStale() { return mySession !== GameData.sessionId; }
 
+  // Etapa 1: o boss "fala" a pergunta (balão), sem alternativas ainda — tempo pra ler/pensar
   function askQuestion() {
     if (isStale()) return;
     feedbackEl.classList.add('hidden');
@@ -387,19 +407,27 @@ function startBossBattle(scene, phaseConfig, onComplete) {
     const q = questions[qIndex];
     questionEl.textContent = q.q;
     optionsEl.innerHTML = '';
+    answersPanelEl.classList.add('hidden');
 
-    let timeLeft = 30;
-    timerEl.textContent = timeLeft;
-    clearInterval(timerInterval);
-    timerInterval = setInterval(() => {
-      if (isStale()) { clearInterval(timerInterval); return; }
-      timeLeft -= 1;
-      timerEl.textContent = timeLeft;
-      if (timeLeft <= 0) {
-        clearInterval(timerInterval);
-        resolveAnswer(null, q);
+    let readLeft = READING_SECONDS;
+    headerEl.textContent = `💭 alternativas em ${readLeft}s`;
+    clearInterval(readInterval);
+    readInterval = setInterval(() => {
+      if (isStale()) { clearInterval(readInterval); return; }
+      readLeft -= 1;
+      if (readLeft <= 0) {
+        clearInterval(readInterval);
+        revealOptions(q);
+      } else {
+        headerEl.textContent = `💭 alternativas em ${readLeft}s`;
       }
     }, 1000);
+  }
+
+  // Etapa 2: alternativas aparecem, começa o cronômetro de resposta
+  function revealOptions(q) {
+    if (isStale()) return;
+    answersPanelEl.classList.remove('hidden');
 
     q.options.forEach((optText, idx) => {
       const btn = document.createElement('button');
@@ -412,6 +440,19 @@ function startBossBattle(scene, phaseConfig, onComplete) {
       };
       optionsEl.appendChild(btn);
     });
+
+    let timeLeft = ANSWER_SECONDS;
+    headerEl.textContent = `⏱ ${timeLeft}s`;
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      if (isStale()) { clearInterval(timerInterval); return; }
+      timeLeft -= 1;
+      headerEl.textContent = `⏱ ${timeLeft}s`;
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        resolveAnswer(null, q);
+      }
+    }, 1000);
   }
 
   function resolveAnswer(chosenIdx, q) {
@@ -439,6 +480,7 @@ function startBossBattle(scene, phaseConfig, onComplete) {
       qIndex += 1;
       if (GameData.lives <= 0) {
         overlay.classList.add('hidden');
+        answersPanelEl.classList.add('hidden');
         finishBossUI();
         endGame(false);
         return;
@@ -447,6 +489,7 @@ function startBossBattle(scene, phaseConfig, onComplete) {
         askQuestion();
       } else {
         overlay.classList.add('hidden');
+        answersPanelEl.classList.add('hidden');
         finishBossUI();
         onComplete();
       }
@@ -454,6 +497,9 @@ function startBossBattle(scene, phaseConfig, onComplete) {
   }
 
   function finishBossUI() {
+    clearInterval(readInterval);
+    clearInterval(timerInterval);
+    window.removeEventListener('resize', onResize);
     GameData.paused = false;
     scene.physics.resume();
     scene.inputManager.setEnabled(true);
@@ -482,6 +528,7 @@ function updateInfoBubble(playerX, infoSpots, phaseId) {
     if (activeInfoId !== nearest.id) {
       activeInfoId = nearest.id;
       GameData.infosSeen.add(nearest.id); // só estatística, não pontua
+      updateMuraisCounter(phaseId, infoSpots.length);
       bubble.querySelector('.info-bubble-content').textContent = '📄 ' + nearest.text;
       bubble.classList.remove('hidden');
     }
@@ -504,6 +551,20 @@ class PhaseScene extends Phaser.Scene {
 
   preload() {
     buildAllTextures(this);
+
+    if (!this.textures.exists('officeBg')) {
+      this.load.image('officeBg', 'assets/backgrounds/office_bg.png');
+    }
+
+    const charId = GameData.selectedCharacter;
+    if (!this.textures.exists(`char_${charId}_idle`)) {
+      this.load.spritesheet(`char_${charId}_idle`, `assets/characters/${charId}/Idle.png`, {
+        frameWidth: CHARACTER_FRAME_SIZE, frameHeight: CHARACTER_FRAME_SIZE,
+      });
+      this.load.spritesheet(`char_${charId}_walk`, `assets/characters/${charId}/Walk.png`, {
+        frameWidth: CHARACTER_FRAME_SIZE, frameHeight: CHARACTER_FRAME_SIZE,
+      });
+    }
   }
 
   create() {
@@ -515,25 +576,50 @@ class PhaseScene extends Phaser.Scene {
     this.physics.world.setBounds(0, 0, cfg.levelWidth, 540);
     this.cameras.main.setBounds(0, 0, cfg.levelWidth, 540);
 
-    // Fundo decorativo (painéis de parede)
-    for (let x = 0; x < cfg.levelWidth; x += 220) {
-      const deco = this.add.rectangle(x + 100, 280, 140, 220, cfg.decorColor, 0.6);
-      deco.setScrollFactor(0.5);
-    }
+    // Fundo: imagem real do escritório, repetida (tile) ao longo de toda a largura da fase
+    const bgTex = this.textures.get('officeBg').getSourceImage();
+    const bgScale = 540 / bgTex.height; // encaixa a altura da imagem na altura do jogo (540px)
+    const bg = this.add.tileSprite(cfg.levelWidth / 2, 270, cfg.levelWidth, 540, 'officeBg');
+    bg.setTileScale(bgScale, bgScale);
+    bg.setScrollFactor(1);
 
-    // Chão
+    // Chão (invisível — a própria imagem de fundo já mostra o piso; mantém só a física)
     this.groundGroup = this.physics.add.staticGroup();
     for (let x = 0; x < cfg.levelWidth; x += 64) {
-      this.groundGroup.create(x + 32, 500, 'ground').refreshBody();
+      this.groundGroup.create(x + 32, 500, 'ground').setVisible(false).refreshBody();
     }
 
-    // Player (pixel art)
-    this.player = this.physics.add.sprite(80, 400, 'player_idle');
+    // Player (sprite real — CraftPix City Men)
+    const charId = GameData.selectedCharacter;
+    const charDef = CHARACTERS.find((c) => c.id === charId);
+
+    if (!this.anims.exists(`${charId}_idle`)) {
+      this.anims.create({
+        key: `${charId}_idle`,
+        frames: this.anims.generateFrameNumbers(`char_${charId}_idle`, { start: 0, end: charDef.idleFrames - 1 }),
+        frameRate: 6,
+        repeat: -1,
+      });
+    }
+    if (!this.anims.exists(`${charId}_walk`)) {
+      this.anims.create({
+        key: `${charId}_walk`,
+        frames: this.anims.generateFrameNumbers(`char_${charId}_walk`, { start: 0, end: charDef.walkFrames - 1 }),
+        frameRate: 12,
+        repeat: -1,
+      });
+    }
+
+    this.player = this.physics.add.sprite(80, 460, `char_${charId}_idle`, 0);
     this.player.setOrigin(0.5, 1);
+    this.player.body.setAllowGravity(false); // sem pulo — o personagem não precisa de gravidade
+    this.player.setSize(CHARACTER_BODY.width, CHARACTER_BODY.height);
+    this.player.body.setOffset(CHARACTER_BODY.offsetX, CHARACTER_BODY.offsetY);
+    this.player.setScale(CHARACTER_SCALE);
     this.player.setCollideWorldBounds(true);
     this.player.setDragX(900);
-    this.player.setMaxVelocity(220, 900);
-    this.physics.add.collider(this.player, this.groundGroup);
+    this.player.setMaxVelocity(220, 0);
+    this.player.anims.play(`${charId}_idle`);
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
 
     // Murais/quadros na parede (posição real do mundo — igual ao cálculo de proximidade)
@@ -544,7 +630,7 @@ class PhaseScene extends Phaser.Scene {
 
     // Boss no fim da fase
     const bossX = cfg.levelWidth - 160;
-    this.add.image(bossX, 460, 'bossTex').setOrigin(0.5, 1);
+    this.bossSprite = this.add.image(bossX, 460, 'bossTex').setOrigin(0.5, 1);
     this.bossZone = this.add.zone(bossX, 460, 70, 100);
     this.physics.add.existing(this.bossZone, true);
     this.bossTriggered = false;
@@ -552,7 +638,7 @@ class PhaseScene extends Phaser.Scene {
       if (!this.bossTriggered && !GameData.paused) {
         this.bossTriggered = true;
         this.player.setVelocity(0, 0);
-        startBossBattle(this, cfg, () => this.onBossDefeated());
+        startBossBattle(this, cfg, this.bossSprite, () => this.onBossDefeated());
       }
     });
 
@@ -569,11 +655,10 @@ class PhaseScene extends Phaser.Scene {
     // Sistema de input (teclado por padrão; pronto para touch/gamepad no futuro)
     this.inputManager = new InputManager(this);
 
-    // Controle de animação de "andar" (alterna frames)
-    this.walkFrameTimer = 0;
-    this.walkFrameToggle = false;
-
+    this.levelWidth = cfg.levelWidth;
     updateHUD();
+    updateMuraisCounter(cfg.id, cfg.infoSpots.length);
+    updateBossProgress(this.player.x, this.levelWidth);
   }
 
   onBossDefeated() {
@@ -596,57 +681,32 @@ class PhaseScene extends Phaser.Scene {
     }
   }
 
-  update(time) {
+  update() {
     // Mural por proximidade — nunca pausa o jogo
     updateInfoBubble(this.player.x, this.infoSpots, this.config.id);
+    updateBossProgress(this.player.x, this.levelWidth);
 
     if (GameData.paused) {
       this.player.setVelocityX(0);
+      const idleAnim = `${GameData.selectedCharacter}_idle`;
+      if (this.player.anims.currentAnim?.key !== idleAnim) {
+        this.player.anims.play(idleAnim, true);
+      }
       return;
     }
 
-    const onGround = this.player.body.blocked.down || this.player.body.touching.down;
+    const charId = GameData.selectedCharacter;
     const left = this.inputManager.left();
     const right = this.inputManager.right();
-    const jump = this.inputManager.jump();
-    const duck = this.inputManager.duck();
-    const isDucking = duck && onGround;
 
-    if (isDucking) {
-      if (this.player.texture.key !== 'player_duck') {
-        this.player.setTexture('player_duck');
-        this.player.body.updateFromGameObject();
-      }
-      this.player.setVelocityX(0);
-    } else {
-      let vx = 0;
-      if (left) { vx = -160; this.player.setFlipX(true); }
-      if (right) { vx = 160; this.player.setFlipX(false); }
-      this.player.setVelocityX(vx);
+    let vx = 0;
+    if (left) { vx = -160; this.player.setFlipX(true); }
+    if (right) { vx = 160; this.player.setFlipX(false); }
+    this.player.setVelocityX(vx);
 
-      if (jump && onGround) this.player.setVelocityY(-360);
-
-      if (!onGround) {
-        if (this.player.texture.key !== 'player_jump') {
-          this.player.setTexture('player_jump');
-          this.player.body.updateFromGameObject();
-        }
-      } else if (vx !== 0) {
-        if (time - this.walkFrameTimer > 150) {
-          this.walkFrameTimer = time;
-          this.walkFrameToggle = !this.walkFrameToggle;
-          const key = this.walkFrameToggle ? 'player_walk1' : 'player_walk2';
-          if (this.player.texture.key !== key) {
-            this.player.setTexture(key);
-            this.player.body.updateFromGameObject();
-          }
-        }
-      } else {
-        if (this.player.texture.key !== 'player_idle') {
-          this.player.setTexture('player_idle');
-          this.player.body.updateFromGameObject();
-        }
-      }
+    const desiredAnim = vx !== 0 ? `${charId}_walk` : `${charId}_idle`;
+    if (this.player.anims.currentAnim?.key !== desiredAnim) {
+      this.player.anims.play(desiredAnim, true);
     }
   }
 }
@@ -668,6 +728,22 @@ const config = {
 const game = new Phaser.Game(config);
 // Registrado manualmente, mas com autostart desligado (3º argumento = false).
 // A cena só é iniciada de fato quando o jogador confirma o nome e clica em "Jogar".
+
+// ---------------------------------------------------------
+// TELA CHEIA RESPONSIVA
+// O jogo roda internamente sempre em 960x540 (mesma resolução de sempre,
+// então nada da lógica/posicionamento muda). O #game-wrapper inteiro
+// (canvas + HUD + caixas de diálogo) é escalado via CSS transform pra
+// preencher a tela do usuário, mantendo a proporção 16:9.
+// ---------------------------------------------------------
+function fitGameToScreen() {
+  const wrapper = document.getElementById('game-wrapper');
+  if (!wrapper) return;
+  const scale = Math.min(window.innerWidth / 960, window.innerHeight / 540);
+  wrapper.style.transform = `translate(-50%, -50%) scale(${scale})`;
+}
+window.addEventListener('resize', fitGameToScreen);
+fitGameToScreen();
 game.scene.add('PhaseScene', PhaseScene, false);
 
 // ---------------------------------------------------------
@@ -685,6 +761,15 @@ document.querySelectorAll('.menu-btn[data-target], .back-btn[data-target]').forE
 
 const nameInput = document.getElementById('player-name-start');
 const nameWarning = document.getElementById('name-warning');
+
+document.querySelectorAll('.character-option').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.character-option').forEach((b) => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    GameData.selectedCharacter = btn.dataset.character;
+    document.getElementById('hud-character-icon').src = `assets/thumbnails/${GameData.selectedCharacter}.png`;
+  });
+});
 
 document.getElementById('confirm-name-btn').addEventListener('click', () => {
   const name = nameInput.value.trim();
