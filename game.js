@@ -11,7 +11,6 @@
 const RANKING_KEY = 'empresario_ranking_v1';
 const MAX_LIVES = 3;
 const INFO_PROXIMITY_RADIUS = 90; // px — raio em que o mural fica visível
-const READING_SECONDS = 5; // tempo em que só a pergunta aparece (boss "falando"), sem alternativas
 const ANSWER_SECONDS = 30;  // tempo pra responder depois que as alternativas aparecem
 
 // ---------------------------------------------------------
@@ -45,7 +44,7 @@ const CHARACTERS = [
 const CHARACTER_FRAME_SIZE = 128;
 // Hitbox real do personagem dentro do frame 128x128 (o resto é espaço transparente)
 const CHARACTER_BODY = { width: 44, height: 70, offsetX: 42, offsetY: 58 };
-const CHARACTER_SCALE = 2.2; // aumenta/diminui o tamanho do personagem em tela
+const CHARACTER_SCALE = 2.7; // aumenta/diminui o tamanho do personagem em tela
 
 // ---------------------------------------------------------
 // ESTADO GLOBAL DO JOGO (sobrevive entre trocas de fase/cena)
@@ -86,9 +85,15 @@ const PHASES = [
     skyColor: 0x18233d,
     groundColor: 0x2c3350,
     decorColor: 0x22304f,
-    levelWidth: 2200,
+    levelWidth: 1990,
+    // Posição do boss/porta nesta fase (em pixels, dentro da imagem de fundo de 2200x540).
+    // Ajuste bossX/bossY livremente pra encaixar o boss na cadeira/mesa da sua arte.
+    // bossY é a linha do "chão" onde os pés do boss encostam (mesma lógica do player).
+    bossX: 1700,
+    bossY: 330,
+    doorX: 2130, // porta de saída (some até vencer o boss)
     infoSpots: [
-      { x: 500, text: 'Todo negócio formal precisa de um CNPJ — é o "CPF" da empresa perante o governo.' },
+      { x: 180, y: 500, text: 'Todo negócio formal precisa de um CNPJ — é o "CPF" da empresa perante o governo.' },
       { x: 950, text: 'Existem vários tipos de empresa (MEI, ME, LTDA...). O ideal depende do seu faturamento e atividade.' },
       { x: 1500, text: 'Um contador não é só pra fazer imposto: ele te ajuda a tomar decisões melhores desde o início.' },
     ],
@@ -107,7 +112,10 @@ const PHASES = [
     skyColor: 0x18233d,
     groundColor: 0x2c3350,
     decorColor: 0x22304f,
-    levelWidth: 2400,
+    levelWidth: 1990,
+    bossX: 1700,
+    bossY: 460,
+    doorX: 2330,
     infoSpots: [
       { x: 500, text: 'Fluxo de caixa é o controle de tudo que entra e sai de dinheiro na empresa.' },
       { x: 1000, text: 'Pró-labore é o salário do dono — separar isso do lucro da empresa evita confusão financeira.' },
@@ -128,7 +136,10 @@ const PHASES = [
     skyColor: 0x18233d,
     groundColor: 0x2c3350,
     decorColor: 0x22304f,
-    levelWidth: 2400,
+    levelWidth: 1990,
+    bossX: 2100,
+    bossY: 460,
+    doorX: 2330,
     infoSpots: [
       { x: 500, text: 'Nota fiscal registra a venda oficialmente — evita problemas com o fisco e passa confiança ao cliente.' },
       { x: 1000, text: 'A reforma tributária vai unificar vários impostos em dois: CBS e IBS.' },
@@ -353,22 +364,44 @@ function endGame(won) {
 // BATALHA DE BOSS — PAUSA o jogo (física + input) enquanto ativa
 // ---------------------------------------------------------
 function positionBossDialogue(scene, bossSprite) {
-  const canvas = scene.game.canvas;
-  const wrapper = document.getElementById('game-wrapper');
-  const wrapperRect = wrapper.getBoundingClientRect();
-  const scaleFactor = canvas.clientWidth / canvas.width; // canvas.width = resolução nativa (960)
-
+  // #game-wrapper é sempre 960x540 "por dentro" — o zoom de tela cheia (fitGameToScreen)
+  // é feito com um CSS transform em cima do wrapper inteiro, então tudo que está dentro
+  // dele (HUD, balões etc.) escala JUNTO automaticamente. Por isso aqui a gente só usa
+  // as coordenadas nativas (960x540), sem multiplicar por nenhum fator de zoom.
   const bounds = bossSprite.getBounds();
   const scrollX = scene.cameras.main.scrollX;
-  let screenX = (bounds.centerX - scrollX) * scaleFactor;
-  const screenTopY = bounds.top * scaleFactor;
+  let screenX = bounds.centerX - scrollX;
+  const screenTopY = bounds.top;
 
   // Evita o balão sair da tela quando o boss está perto da borda direita/esquerda
-  screenX = Math.min(Math.max(screenX, 160), wrapperRect.width - 160);
+  screenX = Math.min(Math.max(screenX, 160), 960 - 160);
 
   const dialogueEl = document.getElementById('boss-dialogue');
   dialogueEl.style.left = `${screenX}px`;
-  dialogueEl.style.bottom = `${wrapperRect.height - screenTopY + 26}px`;
+  dialogueEl.style.bottom = `${540 - screenTopY + 26}px`;
+}
+
+// Frases de transição do "boss falando" — variam um pouco por pergunta pra não ficar repetitivo.
+// Fique à vontade pra editar/adicionar mais frases nessas listas.
+const BOSS_INTRO_LINES = [
+  'Vamos testar seus conhecimentos sobre isso!',
+  'Aqui vai a próxima pergunta:',
+  'Última pergunta, vamos lá:',
+];
+const BOSS_CORRECT_LINES = [
+  'Isso mesmo! Mandou bem.',
+  'Perfeito, é exatamente isso!',
+  'Excelente resposta!',
+];
+const BOSS_WRONG_LINES = [
+  'Não foi dessa vez.',
+  'Quase! Deixa eu te explicar:',
+  'Essa é traiçoeira, mas vamos entender:',
+];
+const TYPE_SPEED_MS = 45; // velocidade da digitação (ms por letra) — aumente pra deixar mais devagar, diminua pra mais rápido
+
+function pickLine(list, index) {
+  return list[Math.min(index, list.length - 1)];
 }
 
 function startBossBattle(scene, phaseConfig, bossSprite, onComplete) {
@@ -378,8 +411,6 @@ function startBossBattle(scene, phaseConfig, bossSprite, onComplete) {
   scene.inputManager.setEnabled(false);
 
   positionBossDialogue(scene, bossSprite);
-  const onResize = () => positionBossDialogue(scene, bossSprite);
-  window.addEventListener('resize', onResize);
 
   const overlay = document.getElementById('boss-overlay');
   const nameEl = document.getElementById('boss-name');
@@ -387,47 +418,62 @@ function startBossBattle(scene, phaseConfig, bossSprite, onComplete) {
   const questionEl = document.getElementById('question-text');
   const answersPanelEl = document.getElementById('boss-answers-panel');
   const optionsEl = document.getElementById('question-options');
-  const feedbackEl = document.getElementById('question-feedback');
 
   overlay.classList.remove('hidden');
   nameEl.textContent = `⚔️ ${phaseConfig.boss.name}`;
 
   const questions = pickRandom(phaseConfig.boss.questions, 3);
   let qIndex = 0;
-  let readInterval = null;
   let timerInterval = null;
+  let typeInterval = null;
+  const typeState = { instant: false };
 
   function isStale() { return mySession !== GameData.sessionId; }
 
-  // Etapa 1: o boss "fala" a pergunta (balão), sem alternativas ainda — tempo pra ler/pensar
-  function askQuestion() {
-    if (isStale()) return;
-    feedbackEl.classList.add('hidden');
-    feedbackEl.textContent = '';
-    const q = questions[qIndex];
-    questionEl.textContent = q.q;
-    optionsEl.innerHTML = '';
-    answersPanelEl.classList.add('hidden');
-
-    let readLeft = READING_SECONDS;
-    headerEl.textContent = `💭 alternativas em ${readLeft}s`;
-    clearInterval(readInterval);
-    readInterval = setInterval(() => {
-      if (isStale()) { clearInterval(readInterval); return; }
-      readLeft -= 1;
-      if (readLeft <= 0) {
-        clearInterval(readInterval);
-        revealOptions(q);
-      } else {
-        headerEl.textContent = `💭 alternativas em ${readLeft}s`;
+  // Efeito de "digitação" — clicar no balão pula direto pro texto completo
+  function typeText(text, onDone) {
+    clearInterval(typeInterval);
+    questionEl.textContent = '';
+    headerEl.textContent = '💬';
+    typeState.instant = false;
+    let i = 0;
+    typeInterval = setInterval(() => {
+      if (isStale()) { clearInterval(typeInterval); return; }
+      if (typeState.instant) {
+        questionEl.textContent = text;
+        clearInterval(typeInterval);
+        if (onDone) onDone();
+        return;
       }
-    }, 1000);
+      i += 1;
+      questionEl.textContent = text.slice(0, i);
+      if (i >= text.length) {
+        clearInterval(typeInterval);
+        if (onDone) onDone();
+      }
+    }, TYPE_SPEED_MS);
+  }
+  questionEl.onclick = () => { typeState.instant = true; };
+
+  // Etapa 1: boss "fala" uma introdução, depois a pergunta em si, só então libera as alternativas
+  function playIntroThenQuestion(index) {
+    if (isStale()) return;
+    answersPanelEl.classList.add('hidden');
+    const q = questions[index];
+    typeText(pickLine(BOSS_INTRO_LINES, index), () => {
+      if (isStale()) return;
+      setTimeout(() => {
+        if (isStale()) return;
+        typeText(q.q, () => revealOptions(q));
+      }, 700);
+    });
   }
 
   // Etapa 2: alternativas aparecem, começa o cronômetro de resposta
   function revealOptions(q) {
     if (isStale()) return;
     answersPanelEl.classList.remove('hidden');
+    optionsEl.innerHTML = '';
 
     q.options.forEach((optText, idx) => {
       const btn = document.createElement('button');
@@ -455,57 +501,56 @@ function startBossBattle(scene, phaseConfig, bossSprite, onComplete) {
     }, 1000);
   }
 
+  // Etapa 3: boss reage (parabeniza ou explica o motivo do erro), depois avança
   function resolveAnswer(chosenIdx, q) {
     if (isStale()) return;
     const isCorrect = chosenIdx === q.correct;
-    const buttons = optionsEl.querySelectorAll('.option-btn');
-    buttons.forEach((b, i) => {
-      b.disabled = true;
-      if (i === q.correct) b.classList.add('correct');
-      if (i === chosenIdx && !isCorrect) b.classList.add('wrong');
-    });
+    answersPanelEl.classList.add('hidden');
 
     if (isCorrect) {
       GameData.correctAnswers += 1;
     } else {
       GameData.lives -= 1;
-      feedbackEl.classList.remove('hidden');
-      feedbackEl.textContent = `❌ Não foi dessa vez! ${q.explanation}`;
     }
     updateHUD();
 
-    const delay = isCorrect ? 900 : 3200;
-    setTimeout(() => {
+    const resultText = isCorrect
+      ? pickLine(BOSS_CORRECT_LINES, qIndex)
+      : `${pickLine(BOSS_WRONG_LINES, qIndex)} ${q.explanation}`;
+
+    typeText(resultText, () => {
       if (isStale()) return;
-      qIndex += 1;
-      if (GameData.lives <= 0) {
-        overlay.classList.add('hidden');
-        answersPanelEl.classList.add('hidden');
-        finishBossUI();
-        endGame(false);
-        return;
-      }
-      if (qIndex < questions.length) {
-        askQuestion();
-      } else {
-        overlay.classList.add('hidden');
-        answersPanelEl.classList.add('hidden');
-        finishBossUI();
-        onComplete();
-      }
-    }, delay);
+      const waitTime = isCorrect ? 1400 : 4200; // dá mais tempo de leitura quando erra (tem explicação)
+      setTimeout(() => {
+        if (isStale()) return;
+        qIndex += 1;
+        if (GameData.lives <= 0) {
+          overlay.classList.add('hidden');
+          finishBossUI();
+          endGame(false);
+          return;
+        }
+        if (qIndex < questions.length) {
+          playIntroThenQuestion(qIndex);
+        } else {
+          overlay.classList.add('hidden');
+          finishBossUI();
+          onComplete();
+        }
+      }, waitTime);
+    });
   }
 
   function finishBossUI() {
-    clearInterval(readInterval);
     clearInterval(timerInterval);
-    window.removeEventListener('resize', onResize);
+    clearInterval(typeInterval);
+    questionEl.onclick = null;
     GameData.paused = false;
     scene.physics.resume();
     scene.inputManager.setEnabled(true);
   }
 
-  askQuestion();
+  playIntroThenQuestion(qIndex);
 }
 
 // ---------------------------------------------------------
@@ -628,10 +673,12 @@ class PhaseScene extends Phaser.Scene {
     });
     this.infoSpots = cfg.infoSpots;
 
-    // Boss no fim da fase
-    const bossX = cfg.levelWidth - 160;
-    this.bossSprite = this.add.image(bossX, 460, 'bossTex').setOrigin(0.5, 1);
-    this.bossZone = this.add.zone(bossX, 460, 70, 100);
+    // Boss no fim da fase (posição vem da config da fase — ver bossX/bossY em PHASES)
+    const bossX = cfg.bossX;
+    const bossY = cfg.bossY;
+    const doorX = cfg.doorX;
+    this.bossSprite = this.add.image(bossX, bossY, 'bossTex').setOrigin(0.5, 1);
+    this.bossZone = this.add.zone(bossX, bossY, 70, 100);
     this.physics.add.existing(this.bossZone, true);
     this.bossTriggered = false;
     this.physics.add.overlap(this.player, this.bossZone, () => {
@@ -643,9 +690,9 @@ class PhaseScene extends Phaser.Scene {
     });
 
     // Porta (só abre após vencer o boss)
-    this.door = this.add.image(bossX + 90, 460, 'doorTex').setOrigin(0.5, 1);
+    this.door = this.add.image(doorX, bossY, 'doorTex').setOrigin(0.5, 1);
     this.door.setVisible(false);
-    this.doorZone = this.add.zone(bossX + 90, 460, 50, 90);
+    this.doorZone = this.add.zone(doorX, bossY, 50, 90);
     this.physics.add.existing(this.doorZone, true);
     this.doorOpen = false;
     this.physics.add.overlap(this.player, this.doorZone, () => {

@@ -245,6 +245,8 @@ body {
   width: 100%;
   font-size: 11px;
   line-height: 1.6;
+  cursor: pointer; /* clicar no balão pula a digitação do texto */
+  min-height: 20px;
 }
 #question-text.question-bubble::after {
   content: "";
@@ -273,15 +275,6 @@ body {
 .option-btn:hover { background: #223258; }
 .option-btn.correct { background: var(--color-success); border-color: #66bb6a; }
 .option-btn.wrong { background: var(--color-danger); border-color: #e57373; }
-
-#question-feedback {
-  margin-top: 16px;
-  font-size: 11px;
-  line-height: 1.7;
-  background: var(--color-primary-dark);
-  border-radius: 8px;
-  padding: 12px;
-}
 
 #end-title { font-size: 20px; color: var(--color-accent); margin-bottom: 14px; }
 #end-message { font-size: 12px; line-height: 1.7; margin-bottom: 14px; }
