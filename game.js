@@ -9,9 +9,10 @@
 // =========================================================
 
 const RANKING_KEY = 'empresario_ranking_v1';
-const MAX_LIVES = 3;
+const MAX_LIVES = 6;
 const INFO_PROXIMITY_RADIUS = 90; // px — raio em que o mural fica visível
 const ANSWER_SECONDS = 30;  // tempo pra responder depois que as alternativas aparecem
+const ONCE_BUBBLE_MIN_MS = 4500; // tempo mínimo que um mural "de uso único" fica aberto, mesmo andando
 
 // ---------------------------------------------------------
 // TEMA / IDENTIDADE VISUAL (deve bater com :root em style.css)
@@ -86,23 +87,25 @@ const PHASES = [
     groundColor: 0x2c3350,
     decorColor: 0x22304f,
     levelWidth: 1990,
-    // Posição do boss/porta nesta fase (em pixels, dentro da imagem de fundo de 2200x540).
-    // Ajuste bossX/bossY livremente pra encaixar o boss na cadeira/mesa da sua arte.
-    // bossY é a linha do "chão" onde os pés do boss encostam (mesma lógica do player).
-    bossX: 1700,
-    bossY: 330,
-    doorX: 2130, // porta de saída (some até vencer o boss)
+    bg: 'street_bg.png',
+    bossX: 1750,
+    bossY: 460,
+    doorX: 1770,
+    groundY: 480,
+    showExitArrow: true,
+    exitDirection: 'forward', // seta aponta pra frente
+    characterScale: 1.8,
     infoSpots: [
-      { x: 180, y: 500, text: 'Todo negócio formal precisa de um CNPJ — é o "CPF" da empresa perante o governo.' },
-      { x: 950, text: 'Existem vários tipos de empresa (MEI, ME, LTDA...). O ideal depende do seu faturamento e atividade.' },
-      { x: 1500, text: 'Um contador não é só pra fazer imposto: ele te ajuda a tomar decisões melhores desde o início.' },
+      { x: 440, y: 340, text: 'Nota fiscal registra a venda oficialmente — evita problemas com o fisco e passa confiança ao cliente.' },
+      { x: 820, y: 320, text: 'A reforma tributária vai unificar vários impostos em dois: CBS e IBS.' },
+      { x: 1300, y: 320, text: 'Planejamento tributário legal ajuda a pagar só o imposto necessário, dentro da lei.' },
     ],
     boss: {
-      name: 'Empresário Desorganizado',
+      name: 'Guardião da Reforma Tributária',
       questions: [
-        { q: 'O que é CNPJ?', options: ['Um tipo de imposto', 'O documento de identificação da empresa', 'Um empréstimo bancário', 'Um tipo de contrato de trabalho'], correct: 1, explanation: 'CNPJ é o Cadastro Nacional da Pessoa Jurídica: identifica a empresa perante o governo, bancos e clientes.' },
-        { q: 'Qual a principal vantagem de ter um contador desde o começo?', options: ['Ele garante que a empresa nunca pague imposto', 'Ele ajuda a organizar e planejar decisões financeiras', 'Ele é obrigatório só depois de 1 ano de empresa', 'Ele substitui o dono na gestão'], correct: 1, explanation: 'O contador ajuda a organizar as finanças e orientar decisões — quanto antes ele entra, menos erros custosos acontecem.' },
-        { q: 'O tipo de empresa ideal para abrir depende de quê?', options: ['Da cor do logotipo', 'Só da vontade do dono', 'Do faturamento e da atividade do negócio', 'Do número de sócios apenas'], correct: 2, explanation: 'Faturamento esperado e tipo de atividade definem o enquadramento (MEI, ME, LTDA etc.) mais vantajoso.' },
+        { q: 'Para que serve emitir nota fiscal?', options: ['Só para o cliente ter um papel', 'Para registrar a venda oficialmente e evitar problemas', 'Não é importante para pequenas empresas', 'É opcional em qualquer venda'], correct: 1, explanation: 'A nota fiscal formaliza a venda perante o fisco e transmite mais confiança e segurança ao cliente.' },
+        { q: 'A reforma tributária vai unificar vários tributos em quais siglas?', options: ['ICMS e ISS', 'CBS e IBS', 'IPTU e IPVA', 'INSS e FGTS'], correct: 1, explanation: 'A reforma cria a CBS (federal) e o IBS (estadual/municipal), substituindo vários tributos atuais.' },
+        { q: 'O que é planejamento tributário (feito de forma legal)?', options: ['Sonegar imposto', 'Organizar a empresa para pagar só o imposto devido, dentro da lei', 'Atrasar pagamentos de propósito', 'Um tipo de empréstimo bancário'], correct: 1, explanation: 'Planejamento tributário legal significa estruturar a empresa para não pagar mais imposto do que o necessário, sempre dentro da lei.' },
       ],
     },
   },
@@ -113,13 +116,18 @@ const PHASES = [
     groundColor: 0x2c3350,
     decorColor: 0x22304f,
     levelWidth: 1990,
-    bossX: 1700,
-    bossY: 460,
-    doorX: 2330,
+    bg: 'agencia_bg.png',
+    bossX: 1790,
+    bossY: 290,
+    doorX: 100,
+    groundY: 400,
+    showExitArrow: true,
+    exitDirection: 'backward', // seta aponta pra trás (saindo da empresa)
+    characterScale: 2.2,
     infoSpots: [
-      { x: 500, text: 'Fluxo de caixa é o controle de tudo que entra e sai de dinheiro na empresa.' },
-      { x: 1000, text: 'Pró-labore é o salário do dono — separar isso do lucro da empresa evita confusão financeira.' },
-      { x: 1600, text: 'Misturar conta pessoal com conta da empresa é um dos erros mais comuns de quem começa.' },
+      { x: 195, y: 235, text: 'Olá, Seja bem vindo a Agência Sebrae RN.', textAfterBoss: 'Tchau! Foi um prazer te ajudar, volte sempre.', },
+      { x: 700, y: 245, text: 'Pró-labore é o salário do dono — separar isso do lucro da empresa evita confusão financeira.', once: true, },
+      { x: 1400, y: 255, text: 'Misturar conta pessoal com conta da empresa é um dos erros mais comuns de quem começa.', once: true, },
     ],
     boss: {
       name: 'Fiscalizador das Finanças',
@@ -136,21 +144,28 @@ const PHASES = [
     skyColor: 0x18233d,
     groundColor: 0x2c3350,
     decorColor: 0x22304f,
-    levelWidth: 1990,
-    bossX: 2100,
-    bossY: 460,
-    doorX: 2330,
+    levelWidth: 1994,
+    bg: 'office_bg.jpg', // nome do arquivo em assets/backgrounds/
+    // Posição do boss/porta nesta fase (em pixels, dentro da imagem de fundo de 2200x540).
+    // Ajuste bossX/bossY livremente pra encaixar o boss na cadeira/mesa da sua arte.
+    // bossY é a linha do "chão" onde os pés do boss encostam (mesma lógica do player).
+    bossX: 1700,
+    bossY: 330,
+    doorX: 1750, // porta de saída (some até vencer o boss)
+    groundY: 460,        // altura em que os PÉS do personagem encostam nesta fase (chão da perspectiva)
+    showExitArrow: false, // fase final: sem seta, o jogo encerra na hora
+    characterScale: 2.7, // tamanho do personagem só nesta fase (perspectivas diferentes = tamanhos diferentes)
     infoSpots: [
-      { x: 500, text: 'Nota fiscal registra a venda oficialmente — evita problemas com o fisco e passa confiança ao cliente.' },
-      { x: 1000, text: 'A reforma tributária vai unificar vários impostos em dois: CBS e IBS.' },
-      { x: 1600, text: 'Planejamento tributário legal ajuda a pagar só o imposto necessário, dentro da lei.' },
+      { x: 210, y: 230, text: 'Olá, Seja bem vindo a JS Grilo Contabilidade.' },
+      { x: 720, y: 230, text: 'Existem vários tipos de empresa (MEI, ME, LTDA...). O ideal depende do seu faturamento e atividade.' },
+      { x: 1355, y: 210, text: 'Um contador não é só pra fazer imposto: ele te ajuda a tomar decisões melhores desde o início.' },
     ],
     boss: {
-      name: 'Guardião da Reforma Tributária',
+      name: 'Empresário Desorganizado',
       questions: [
-        { q: 'Para que serve emitir nota fiscal?', options: ['Só para o cliente ter um papel', 'Para registrar a venda oficialmente e evitar problemas', 'Não é importante para pequenas empresas', 'É opcional em qualquer venda'], correct: 1, explanation: 'A nota fiscal formaliza a venda perante o fisco e transmite mais confiança e segurança ao cliente.' },
-        { q: 'A reforma tributária vai unificar vários tributos em quais siglas?', options: ['ICMS e ISS', 'CBS e IBS', 'IPTU e IPVA', 'INSS e FGTS'], correct: 1, explanation: 'A reforma cria a CBS (federal) e o IBS (estadual/municipal), substituindo vários tributos atuais.' },
-        { q: 'O que é planejamento tributário (feito de forma legal)?', options: ['Sonegar imposto', 'Organizar a empresa para pagar só o imposto devido, dentro da lei', 'Atrasar pagamentos de propósito', 'Um tipo de empréstimo bancário'], correct: 1, explanation: 'Planejamento tributário legal significa estruturar a empresa para não pagar mais imposto do que o necessário, sempre dentro da lei.' },
+        { q: 'O que é CNPJ?', options: ['Um tipo de imposto', 'O documento de identificação da empresa', 'Um empréstimo bancário', 'Um tipo de contrato de trabalho'], correct: 1, explanation: 'CNPJ é o Cadastro Nacional da Pessoa Jurídica: identifica a empresa perante o governo, bancos e clientes.' },
+        { q: 'Qual a principal vantagem de ter um contador desde o começo?', options: ['Ele garante que a empresa nunca pague imposto', 'Ele ajuda a organizar e planejar decisões financeiras', 'Ele é obrigatório só depois de 1 ano de empresa', 'Ele substitui o dono na gestão'], correct: 1, explanation: 'O contador ajuda a organizar as finanças e orientar decisões — quanto antes ele entra, menos erros custosos acontecem.' },
+        { q: 'O tipo de empresa ideal para abrir depende de quê?', options: ['Da cor do logotipo', 'Só da vontade do dono', 'Do faturamento e da atividade do negócio', 'Do número de sócios apenas'], correct: 2, explanation: 'Faturamento esperado e tipo de atividade definem o enquadramento (MEI, ME, LTDA etc.) mais vantajoso.' },
       ],
     },
   },
@@ -184,13 +199,6 @@ function updateMuraisCounter(phaseId, total) {
   GameData.infosSeen.forEach((id) => { if (id.startsWith(`${phaseId}_`)) count += 1; });
   document.getElementById('hud-murais-count').textContent = count;
   document.getElementById('hud-murais-total').textContent = total;
-}
-
-// Move o marcador do mini indicador "rumo ao chefe" conforme o jogador avança na fase
-function updateBossProgress(playerX, levelWidth) {
-  const pct = Math.min(100, Math.max(0, (playerX / levelWidth) * 100));
-  document.getElementById('hud-progress-fill').style.width = `${pct}%`;
-  document.getElementById('hud-progress-marker').style.left = `${pct}%`;
 }
 
 function loadRanking() {
@@ -301,12 +309,24 @@ const BOSS_FRAME = [
   '...GG....GG...', '...GG....GG...',
 ];
 
-const POSTER_PALETTE = { F: 0x8a5a2b, C: THEME.cream, L: 0x9a9a9a };
 const POSTER_FRAME = [
-  'FFFFFFFFFFFFFF', 'FCCCCCCCCCCCCF', 'FCLLLLLLLLLLCF', 'FCLLLLLLLLLLCF',
-  'FCLLLLL.LLLLCF', 'FCLLLLLLLLLLCF', 'FCLLLL.LLLLLCF', 'FCLLLLLLLLLLCF',
-  'FCLLLLLLLLLLCF', 'FCCCCCCCCCCCCF', 'FFFFFFFFFFFFFF',
+  "............",
+  "...BBBBBB...",
+  "..BWWWWWWB..",
+  ".BWWWWWWWWB.",
+  ".BWWDWDWDWB.",
+  ".BWWWWWWWWB.",
+  "..BWWWWWWB..",
+  "...BBBBBB...",
+  ".....BB.....",
+  "....BB......",
 ];
+
+const POSTER_PALETTE = {
+  B: 0xf5f0e6, // borda dourada
+  W: 0xf5f0e6, // interior claro
+  D: 0x14213d, // três pontos azuis
+};
 
 const DOOR_PALETTE = { F: 0x8a5a2b, D: 0x6b4423, K: THEME.accent };
 const DOOR_FRAME = [
@@ -399,6 +419,7 @@ const BOSS_WRONG_LINES = [
   'Essa é traiçoeira, mas vamos entender:',
 ];
 const TYPE_SPEED_MS = 45; // velocidade da digitação (ms por letra) — aumente pra deixar mais devagar, diminua pra mais rápido
+const INFO_TYPE_SPEED_MS = 30;
 
 function pickLine(list, index) {
   return list[Math.min(index, list.length - 1)];
@@ -554,32 +575,134 @@ function startBossBattle(scene, phaseConfig, bossSprite, onComplete) {
 }
 
 // ---------------------------------------------------------
-// MURAL / QUADRO DE INFORMAÇÃO — aparece por proximidade, some ao se afastar (sem pausar o jogo)
+// BALÃO DE INFORMAÇÃO DOS NPCS
+// Abre por proximidade, digita letra por letra e fecha ao se afastar.
+// Não pausa o jogo.
 // ---------------------------------------------------------
+
 let activeInfoId = null;
-function updateInfoBubble(playerX, infoSpots, phaseId) {
+let infoTypeInterval = null;
+
+function typeInfoText(element, text) {
+  clearInterval(infoTypeInterval);
+
+  element.textContent = "";
+
+  let charIndex = 0;
+
+  infoTypeInterval = setInterval(() => {
+    charIndex += 1;
+    element.textContent = text.slice(0, charIndex);
+
+    if (charIndex >= text.length) {
+      clearInterval(infoTypeInterval);
+      infoTypeInterval = null;
+    }
+  }, INFO_TYPE_SPEED_MS);
+}
+
+function animateInfoBubbleOpening(bubble) {
+  bubble.classList.remove("info-bubble-opening");
+
+  // Força o navegador a reiniciar a animação
+  void bubble.offsetWidth;
+
+  bubble.classList.add("info-bubble-opening");
+}
+
+function positionInfoBubble(scene, spot) {
+  const bubble = document.getElementById("info-bubble");
+  const camera = scene.cameras.main;
+
+  let screenX = spot.x - camera.scrollX;
+  let screenY = (spot.y ?? 300) - camera.scrollY;
+
+  const halfBubbleWidth = 165;
+
+  screenX = Phaser.Math.Clamp(
+    screenX,
+    halfBubbleWidth,
+    960 - halfBubbleWidth
+  );
+
+  screenY = Math.max(screenY, 115);
+
+  bubble.style.left = `${screenX}px`;
+  bubble.style.top = `${screenY - 8}px`;
+}
+
+function updateInfoBubble(scene, playerX, infoSpots, phaseId, infoIcons) {
+  // Enquanto "segurada" (tempo mínimo de leitura), continua atualizando a POSIÇÃO
+  // na tela (acompanhando o scroll da câmera) — só não reavalia nem reinicia a digitação.
+  if (scene.pinnedInfoUntil && Date.now() < scene.pinnedInfoUntil) {
+    if (scene.pinnedSpot) positionInfoBubble(scene, scene.pinnedSpot);
+    return;
+  }
+  scene.pinnedInfoUntil = null;
+  scene.pinnedSpot = null;
+
   let nearest = null;
   let nearestDist = Infinity;
-  infoSpots.forEach((spot, i) => {
-    const dist = Math.abs(playerX - spot.x);
-    if (dist <= INFO_PROXIMITY_RADIUS && dist < nearestDist) {
-      nearest = { id: `${phaseId}_${i}`, text: spot.text };
-      nearestDist = dist;
+
+  infoSpots.forEach((spot, index) => {
+    if (spot.once && scene.usedOnceSpots?.has(index)) return;
+
+    const distance = Math.abs(playerX - spot.x);
+    if (distance <= INFO_PROXIMITY_RADIUS && distance < nearestDist) {
+      const text = (spot.textAfterBoss && scene.doorOpen) ? spot.textAfterBoss : spot.text;
+      nearest = { id: `${phaseId}_${index}`, index, spot, text };
+      nearestDist = distance;
     }
   });
 
-  const bubble = document.getElementById('info-bubble');
+  const bubble = document.getElementById("info-bubble");
+  const content = bubble.querySelector(".info-bubble-content");
+
   if (nearest) {
+    positionInfoBubble(scene, nearest.spot);
+
     if (activeInfoId !== nearest.id) {
       activeInfoId = nearest.id;
-      GameData.infosSeen.add(nearest.id); // só estatística, não pontua
+      GameData.infosSeen.add(nearest.id);
       updateMuraisCounter(phaseId, infoSpots.length);
-      bubble.querySelector('.info-bubble-content').textContent = '📄 ' + nearest.text;
-      bubble.classList.remove('hidden');
+      clearInterval(infoTypeInterval);
+
+      if (infoIcons?.[nearest.index]) {
+        infoIcons[nearest.index].setVisible(false);
+      }
+
+      if (nearest.spot.once) {
+        scene.usedOnceSpots?.add(nearest.index);
+        scene.pinnedInfoUntil = Date.now() + ONCE_BUBBLE_MIN_MS;
+        scene.pinnedSpot = nearest.spot;
+      }
+
+      bubble.classList.remove("info-bubble-hidden");
+      animateInfoBubbleOpening(bubble);
+      typeInfoText(content, `💬 ${nearest.text}`);
     }
-  } else if (activeInfoId !== null) {
+    return;
+  }
+
+  if (activeInfoId !== null) {
+    const previousIndex = Number(activeInfoId.split("_").at(-1));
+    const previousSpot = infoSpots[previousIndex];
     activeInfoId = null;
-    bubble.classList.add('hidden');
+
+    clearInterval(infoTypeInterval);
+    infoTypeInterval = null;
+
+    bubble.classList.remove("info-bubble-opening");
+    bubble.classList.add("info-bubble-hidden");
+
+    setTimeout(() => {
+      if (bubble.classList.contains("info-bubble-hidden")) content.textContent = "";
+    }, 220);
+
+    const staysHidden = previousSpot?.once && scene.usedOnceSpots?.has(previousIndex);
+    if (infoIcons?.[previousIndex] && !staysHidden) {
+      infoIcons[previousIndex].setVisible(true);
+    }
   }
 }
 
@@ -597,8 +720,10 @@ class PhaseScene extends Phaser.Scene {
   preload() {
     buildAllTextures(this);
 
-    if (!this.textures.exists('officeBg')) {
-      this.load.image('officeBg', 'assets/backgrounds/office_bg.png');
+    const cfg = this.config;
+    const bgKey = `bg_${cfg.id}`; // chave única por fase (fase1, fase2, fase3), evita conflito de cache
+    if (!this.textures.exists(bgKey)) {
+      this.load.image(bgKey, `assets/backgrounds/${cfg.bg}`);
     }
 
     const charId = GameData.selectedCharacter;
@@ -614,17 +739,30 @@ class PhaseScene extends Phaser.Scene {
 
   create() {
     activeInfoId = null;
-    document.getElementById('info-bubble').classList.add('hidden');
+    clearInterval(infoTypeInterval);
+    infoTypeInterval = null;
+
+    const infoBubble = document.getElementById("info-bubble");
+
+    infoBubble.classList.remove(
+      "hidden",
+      "info-bubble-opening"
+    );
+
+    infoBubble.classList.add("info-bubble-hidden");
+
+    infoBubble.querySelector(".info-bubble-content").textContent = "";
 
     const cfg = this.config;
     this.cameras.main.setBackgroundColor(cfg.skyColor);
     this.physics.world.setBounds(0, 0, cfg.levelWidth, 540);
     this.cameras.main.setBounds(0, 0, cfg.levelWidth, 540);
 
-    // Fundo: imagem real do escritório, repetida (tile) ao longo de toda a largura da fase
-    const bgTex = this.textures.get('officeBg').getSourceImage();
+    // Fundo: imagem real do escritório/ambiente desta fase, repetida (tile) ao longo da largura
+    const bgKey = `bg_${cfg.id}`;
+    const bgTex = this.textures.get(bgKey).getSourceImage();
     const bgScale = 540 / bgTex.height; // encaixa a altura da imagem na altura do jogo (540px)
-    const bg = this.add.tileSprite(cfg.levelWidth / 2, 270, cfg.levelWidth, 540, 'officeBg');
+    const bg = this.add.tileSprite(cfg.levelWidth / 2, 270, cfg.levelWidth, 540, bgKey);
     bg.setTileScale(bgScale, bgScale);
     bg.setScrollFactor(1);
 
@@ -655,12 +793,17 @@ class PhaseScene extends Phaser.Scene {
       });
     }
 
-    this.player = this.physics.add.sprite(80, 460, `char_${charId}_idle`, 0);
+    // groundY = onde os pés encostam nesta fase; characterScale = tamanho do personagem nesta fase
+    // (cada uma tem fallback pro padrão, então é opcional definir por fase)
+    const groundY = cfg.groundY ?? 460;
+    const charScale = cfg.characterScale ?? CHARACTER_SCALE;
+
+    this.player = this.physics.add.sprite(80, groundY, `char_${charId}_idle`, 0);
     this.player.setOrigin(0.5, 1);
     this.player.body.setAllowGravity(false); // sem pulo — o personagem não precisa de gravidade
     this.player.setSize(CHARACTER_BODY.width, CHARACTER_BODY.height);
     this.player.body.setOffset(CHARACTER_BODY.offsetX, CHARACTER_BODY.offsetY);
-    this.player.setScale(CHARACTER_SCALE);
+    this.player.setScale(charScale);
     this.player.setCollideWorldBounds(true);
     this.player.setDragX(900);
     this.player.setMaxVelocity(220, 0);
@@ -668,8 +811,27 @@ class PhaseScene extends Phaser.Scene {
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
 
     // Murais/quadros na parede (posição real do mundo — igual ao cálculo de proximidade)
-    cfg.infoSpots.forEach((spot) => {
-      this.add.image(spot.x, 300, 'posterTex');
+    this.infoIcons = [];
+
+    this.usedOnceSpots = new Set(); // controla murais de uso único (ex: fase 2 — não reaparecem depois de vistos)
+
+    cfg.infoSpots.forEach((spot, index) => {
+      const icon = this.add
+        .image(spot.x, spot.y ?? 300, "posterTex")
+        .setOrigin(0.5, 1)
+        .setDepth(20)
+        .setAlpha(0.75);
+
+      this.tweens.add({
+        targets: icon,
+        y: icon.y - 4,
+        duration: 650,
+        yoyo: true,
+        repeat: -1,
+        ease: "Sine.easeInOut",
+      });
+
+      this.infoIcons.push(icon);
     });
     this.infoSpots = cfg.infoSpots;
 
@@ -689,15 +851,36 @@ class PhaseScene extends Phaser.Scene {
       }
     });
 
-    // Porta (só abre após vencer o boss)
-    this.door = this.add.image(doorX, bossY, 'doorTex').setOrigin(0.5, 1);
-    this.door.setVisible(false);
-    this.doorZone = this.add.zone(doorX, bossY, 50, 90);
-    this.physics.add.existing(this.doorZone, true);
-    this.doorOpen = false;
-    this.physics.add.overlap(this.player, this.doorZone, () => {
-      if (this.doorOpen) this.goToNextPhase();
-    });
+    // Saída — seta dourada, só existe se a fase tiver uma (fase final não tem)
+    if (cfg.showExitArrow !== false) {
+      const exitY = groundY;
+      const arrowPointsLeft = (cfg.exitDirection || 'forward') === 'backward';
+
+      this.door = this.add.text(doorX, exitY - 90, '➜', {
+        fontSize: '64px', fontStyle: 'bold', color: '#f2a900',
+      }).setOrigin(0.5).setFlipX(arrowPointsLeft).setVisible(false);
+
+      this.doorGlow = this.add.circle(doorX, exitY - 90, 46, THEME.accent, 0.25).setVisible(false);
+      this.tweens.add({
+        targets: this.doorGlow,
+        scale: { from: 0.85, to: 1.15 }, alpha: { from: 0.15, to: 0.35 },
+        duration: 900, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
+      });
+      this.tweens.add({
+        targets: this.door,
+        x: doorX + (arrowPointsLeft ? -12 : 12),
+        duration: 650, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
+      });
+
+      // Checagem por distância (igual aos murais) — bem mais confiável que zona de física
+      this.doorX = doorX;
+      this.doorTriggerRadius = 70;
+      this.doorOpen = false;
+    } else {
+      this.doorOpen = false;
+    }
+
+    this.phaseTransitioning = false; // trava pra não disparar a troca de fase várias vezes seguidas
 
     // Sistema de input (teclado por padrão; pronto para touch/gamepad no futuro)
     this.inputManager = new InputManager(this);
@@ -705,13 +888,16 @@ class PhaseScene extends Phaser.Scene {
     this.levelWidth = cfg.levelWidth;
     updateHUD();
     updateMuraisCounter(cfg.id, cfg.infoSpots.length);
-    updateBossProgress(this.player.x, this.levelWidth);
   }
 
   onBossDefeated() {
+    if (this.config.showExitArrow === false) {
+      this.goToNextPhase();
+      return;
+    }
     this.doorOpen = true;
     this.door.setVisible(true);
-    this.door.setTint(0x66ff99);
+    this.doorGlow.setVisible(true);
   }
 
   goToNextPhase() {
@@ -730,8 +916,13 @@ class PhaseScene extends Phaser.Scene {
 
   update() {
     // Mural por proximidade — nunca pausa o jogo
-    updateInfoBubble(this.player.x, this.infoSpots, this.config.id);
-    updateBossProgress(this.player.x, this.levelWidth);
+    updateInfoBubble(
+      this,
+      this.player.x,
+      this.infoSpots,
+      this.config.id,
+      this.infoIcons
+    );
 
     if (GameData.paused) {
       this.player.setVelocityX(0);
@@ -740,6 +931,13 @@ class PhaseScene extends Phaser.Scene {
         this.player.anims.play(idleAnim, true);
       }
       return;
+    }
+    // Saída da fase — dispara quando o jogador chega perto da seta (só depois do boss cair)
+    if (this.doorOpen && !this.phaseTransitioning && this.doorX !== undefined) {
+      if (Math.abs(this.player.x - this.doorX) < this.doorTriggerRadius) {
+        this.phaseTransitioning = true;
+        this.goToNextPhase();
+      }
     }
 
     const charId = GameData.selectedCharacter;

@@ -6,19 +6,26 @@
    Os mesmos hex também existem em game.js -> THEME (mantenha os dois em sincronia).
    ========================================================= */
 :root {
-  --color-primary: #14213d;      /* azul-marinho — cor principal da marca */
-  --color-primary-dark: #0b1526; /* variação mais escura (fundos) */
-  --color-accent: #f2a900;       /* dourado — cor de destaque/CTA */
+  --color-primary: #14213d;
+  /* azul-marinho — cor principal da marca */
+  --color-primary-dark: #0b1526;
+  /* variação mais escura (fundos) */
+  --color-accent: #f2a900;
+  /* dourado — cor de destaque/CTA */
   --color-accent-light: #ffe27a;
-  --color-cream: #f5f0e6;        /* papel/quadros */
+  --color-cream: #f5f0e6;
+  /* papel/quadros */
   --color-danger: #c0392b;
   --color-success: #2e7d32;
   --color-text: #f5f0e6;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   width: 100%;
@@ -69,7 +76,13 @@ body {
   color: var(--color-text);
 }
 
-.hud-card-top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.hud-card-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
 #hud-character-icon {
   width: 32px;
   height: 32px;
@@ -79,78 +92,112 @@ body {
   border: 2px solid var(--color-accent);
   image-rendering: pixelated;
 }
-#hud-lives { font-size: 13px; }
-.hud-card-row { margin-top: 4px; }
-.hud-card-row span { color: var(--color-accent); }
-.hud-small { font-size: 8px; opacity: 0.85; }
 
-.hud-progress-card { min-width: 160px; }
-.hud-progress-label { margin-bottom: 8px; font-size: 9px; color: var(--color-accent-light); }
-.hud-progress-track {
-  position: relative;
-  height: 10px;
-  background: var(--color-primary-dark);
-  border-radius: 6px;
-  border: 1px solid #3a4a70;
+#hud-lives {
+  font-size: 13px;
 }
-#hud-progress-fill {
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 0%;
-  background: var(--color-accent);
-  border-radius: 6px;
-  transition: width 0.2s ease;
+
+.hud-card-row {
+  margin-top: 4px;
 }
-#hud-progress-marker {
-  position: absolute;
-  top: 50%;
-  left: 0%;
-  transform: translate(-50%, -50%);
-  font-size: 14px;
-  transition: left 0.2s ease;
+
+.hud-card-row span {
+  color: var(--color-accent);
 }
-.hud-progress-boss-marker {
-  position: absolute;
-  top: 50%;
-  right: -4px;
-  transform: translateY(-50%);
-  font-size: 14px;
+
+.hud-small {
+  font-size: 8px;
+  opacity: 0.85;
 }
 
 /* ---------- Balão de informação (mural/quadro) ---------- */
+/* Animação de abertura do balão de informações */
 #info-bubble {
   position: absolute;
-  top: 60px;
-  left: 50%;
-  transform: translateX(-50%);
-  max-width: 480px;
+
+  /* A posição será definida pelo JavaScript */
+  left: 0;
+  top: 0;
+
+  width: 310px;
+  max-width: 310px;
+
   background: var(--color-cream);
   color: #1a1a1a;
   border: 4px solid var(--color-primary);
   border-radius: 10px;
-  padding: 14px 18px;
-  font-size: 12px;
+  padding: 12px 14px;
+
+  font-size: 10px;
   line-height: 1.6;
-  box-shadow: 6px 6px 0 rgba(0,0,0,0.4);
+
+  box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.4);
   z-index: 10;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+
+  opacity: 1;
+  transform: translate(-50%, -100%) scale(1);
+  transform-origin: bottom center;
+
+  transition:
+    opacity 0.15s ease,
+    transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+
 #info-bubble::after {
   content: "";
   position: absolute;
-  bottom: -16px;
+  bottom: -14px;
   left: 50%;
   transform: translateX(-50%);
-  border-width: 16px 10px 0 10px;
+
+  border-width: 14px 9px 0;
   border-style: solid;
-  border-color: var(--color-primary) transparent transparent transparent;
+  border-color:
+    var(--color-primary) transparent transparent transparent;
 }
-#info-bubble.hidden { opacity: 0; pointer-events: none; transform: translateX(-50%) translateY(-8px); }
+
+/* Estado fechado */
+#info-bubble.info-bubble-hidden {
+  opacity: 0;
+  pointer-events: none;
+
+  /*
+   * Começa pequeno exatamente perto da cabeça do NPC,
+   * parecendo que o ícone está se expandindo.
+   */
+  transform: translate(-50%, -100%) scale(0.15);
+}
+
+/* Pequeno estouro ao abrir */
+#info-bubble.info-bubble-opening {
+  animation: infoBubbleOpen 0.26s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes infoBubbleOpen {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -100%) scale(0.15);
+  }
+
+  70% {
+    opacity: 1;
+    transform: translate(-50%, -100%) scale(1.06);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -100%) scale(1);
+  }
+}
 
 /* ---------- Overlays genéricos ---------- */
-.hidden { display: none !important; }
+.hidden {
+  display: none !important;
+}
 
-#end-overlay, #start-overlay, #ranking-overlay {
+#end-overlay,
+#start-overlay,
+#ranking-overlay {
   position: absolute;
   inset: 0;
   background: rgba(11, 21, 38, 0.92);
@@ -161,7 +208,8 @@ body {
   padding: 20px;
 }
 
-.end-panel, .ranking-panel {
+.end-panel,
+.ranking-panel {
   background: var(--color-primary);
   border: 4px solid var(--color-accent);
   border-radius: 10px;
@@ -176,11 +224,13 @@ body {
   position: absolute;
   inset: 0;
   z-index: 20;
-  pointer-events: none; /* deixa o cenário visível; só o balão captura clique */
+  pointer-events: none;
+  /* deixa o cenário visível; só o balão captura clique */
 }
 
 .boss-dialogue {
-  position: absolute; /* left/bottom calculados via JS pra acompanhar a posição do boss */
+  position: absolute;
+  /* left/bottom calculados via JS pra acompanhar a posição do boss */
   pointer-events: auto;
   transform: translateX(-50%);
   display: flex;
@@ -188,7 +238,8 @@ body {
   align-items: center;
   gap: 10px;
   width: 260px;
-  margin-bottom: 22px; /* mais respiro entre o balão e a cabeça do boss */
+  margin-bottom: 22px;
+  /* mais respiro entre o balão e a cabeça do boss */
 }
 
 .boss-name-tag {
@@ -203,7 +254,8 @@ body {
 
 .dialogue-badge {
   position: absolute;
-  top: -26px; /* mais afastado do topo do balão pra não ficar colado */
+  top: -26px;
+  /* mais afastado do topo do balão pra não ficar colado */
   right: 4px;
   background: var(--color-primary);
   border: 2px solid var(--color-accent);
@@ -231,9 +283,12 @@ body {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  box-shadow: 6px 6px 0 rgba(0,0,0,0.35);
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.35);
 }
-.boss-answers-panel.hidden { display: none !important; }
+
+.boss-answers-panel.hidden {
+  display: none !important;
+}
 
 #question-text.question-bubble {
   background: var(--color-cream);
@@ -245,9 +300,11 @@ body {
   width: 100%;
   font-size: 11px;
   line-height: 1.6;
-  cursor: pointer; /* clicar no balão pula a digitação do texto */
+  cursor: pointer;
+  /* clicar no balão pula a digitação do texto */
   min-height: 20px;
 }
+
 #question-text.question-bubble::after {
   content: "";
   position: absolute;
@@ -258,7 +315,13 @@ body {
   border-style: solid;
   border-color: var(--color-cream) transparent transparent transparent;
 }
-#question-options { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+
+#question-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
 
 .option-btn {
   font-family: 'Press Start 2P', monospace;
@@ -272,14 +335,46 @@ body {
   transition: background 0.15s;
   text-align: left;
 }
-.option-btn:hover { background: #223258; }
-.option-btn.correct { background: var(--color-success); border-color: #66bb6a; }
-.option-btn.wrong { background: var(--color-danger); border-color: #e57373; }
 
-#end-title { font-size: 20px; color: var(--color-accent); margin-bottom: 14px; }
-#end-message { font-size: 12px; line-height: 1.7; margin-bottom: 14px; }
-#end-score { font-size: 12px; margin-bottom: 18px; line-height: 2.1; text-align: left; }
-#end-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.option-btn:hover {
+  background: #223258;
+}
+
+.option-btn.correct {
+  background: var(--color-success);
+  border-color: #66bb6a;
+}
+
+.option-btn.wrong {
+  background: var(--color-danger);
+  border-color: #e57373;
+}
+
+#end-title {
+  font-size: 20px;
+  color: var(--color-accent);
+  margin-bottom: 14px;
+}
+
+#end-message {
+  font-size: 12px;
+  line-height: 1.7;
+  margin-bottom: 14px;
+}
+
+#end-score {
+  font-size: 12px;
+  margin-bottom: 18px;
+  line-height: 2.1;
+  text-align: left;
+}
+
+#end-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
 
 button {
   font-family: 'Press Start 2P', monospace;
@@ -291,15 +386,38 @@ button {
   padding: 12px 18px;
   cursor: pointer;
 }
-button:hover { background: var(--color-accent-light); }
-.secondary-btn { background: transparent; color: var(--color-accent); border: 2px solid var(--color-accent); }
-.secondary-btn:hover { background: rgba(242,169,0,0.15); }
 
-#ranking-list-content { text-align: left; font-size: 10px; line-height: 2.1; margin-bottom: 18px; }
-#ranking-list-content ol { padding-left: 20px; margin: 0; }
+button:hover {
+  background: var(--color-accent-light);
+}
+
+.secondary-btn {
+  background: transparent;
+  color: var(--color-accent);
+  border: 2px solid var(--color-accent);
+}
+
+.secondary-btn:hover {
+  background: rgba(242, 169, 0, 0.15);
+}
+
+#ranking-list-content {
+  text-align: left;
+  font-size: 10px;
+  line-height: 2.1;
+  margin-bottom: 18px;
+}
+
+#ranking-list-content ol {
+  padding-left: 20px;
+  margin: 0;
+}
 
 /* ---------- Menu inicial estilo "console" (Jogar / Ranking / Regras / Sobre / Criador) ---------- */
-#start-overlay { align-items: center; overflow-y: auto; }
+#start-overlay {
+  align-items: center;
+  overflow-y: auto;
+}
 
 .menu-wrapper {
   width: 100%;
@@ -316,11 +434,30 @@ button:hover { background: var(--color-accent-light); }
   text-align: center;
 }
 
-.menu-panel h1 { font-size: 20px; color: var(--color-accent); margin-bottom: 14px; text-shadow: 3px 3px 0 rgba(0,0,0,0.4); }
-.menu-panel h2 { font-size: 15px; color: var(--color-accent); margin-bottom: 18px; }
-.menu-panel .tagline { font-size: 11px; line-height: 1.8; margin-bottom: 28px; }
+.menu-panel h1 {
+  font-size: 20px;
+  color: var(--color-accent);
+  margin-bottom: 14px;
+  text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.4);
+}
 
-.menu-buttons { display: flex; flex-direction: column; gap: 14px; }
+.menu-panel h2 {
+  font-size: 15px;
+  color: var(--color-accent);
+  margin-bottom: 18px;
+}
+
+.menu-panel .tagline {
+  font-size: 11px;
+  line-height: 1.8;
+  margin-bottom: 28px;
+}
+
+.menu-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
 
 .menu-btn {
   font-family: 'Press Start 2P', monospace;
@@ -333,18 +470,45 @@ button:hover { background: var(--color-accent-light); }
   cursor: pointer;
   transition: transform 0.1s ease, background 0.15s ease;
 }
-.menu-btn:hover { background: #1c2c52; transform: translateY(-2px); }
+
+.menu-btn:hover {
+  background: #1c2c52;
+  transform: translateY(-2px);
+}
+
 .menu-btn-play {
   background: var(--color-accent);
   color: var(--color-primary-dark);
   border-color: var(--color-accent-light);
 }
-.menu-btn-play:hover { background: var(--color-accent-light); }
 
-.menu-panel ul { text-align: left; margin: 0 0 20px; padding-left: 18px; font-size: 10px; line-height: 2; }
-.menu-panel p { text-align: left; font-size: 10px; line-height: 1.9; margin-bottom: 20px; }
+.menu-btn-play:hover {
+  background: var(--color-accent-light);
+}
 
-.menu-panel label { display: block; font-size: 10px; margin-bottom: 12px; color: var(--color-accent-light); text-align: left; }
+.menu-panel ul {
+  text-align: left;
+  margin: 0 0 20px;
+  padding-left: 18px;
+  font-size: 10px;
+  line-height: 2;
+}
+
+.menu-panel p {
+  text-align: left;
+  font-size: 10px;
+  line-height: 1.9;
+  margin-bottom: 20px;
+}
+
+.menu-panel label {
+  display: block;
+  font-size: 10px;
+  margin-bottom: 12px;
+  color: var(--color-accent-light);
+  text-align: left;
+}
+
 #player-name-start {
   font-family: 'Press Start 2P', monospace;
   font-size: 11px;
@@ -355,14 +519,41 @@ button:hover { background: var(--color-accent-light); }
   background: var(--color-primary-dark);
   color: #fff;
 }
-#name-warning { color: var(--color-danger); font-size: 9px; margin-top: 10px; text-align: left; }
 
-.panel-actions { display: flex; gap: 10px; justify-content: center; margin-top: 22px; flex-wrap: wrap; }
-.back-btn { background: transparent; color: var(--color-accent); border: 2px solid var(--color-accent); margin-top: 18px; }
-.back-btn:hover { background: rgba(242,169,0,0.15); }
+#name-warning {
+  color: var(--color-danger);
+  font-size: 9px;
+  margin-top: 10px;
+  text-align: left;
+}
+
+.panel-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 22px;
+  flex-wrap: wrap;
+}
+
+.back-btn {
+  background: transparent;
+  color: var(--color-accent);
+  border: 2px solid var(--color-accent);
+  margin-top: 18px;
+}
+
+.back-btn:hover {
+  background: rgba(242, 169, 0, 0.15);
+}
 
 /* ---------- Seleção de personagem ---------- */
-.character-grid { display: flex; gap: 14px; margin-bottom: 24px; justify-content: center; }
+.character-grid {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 24px;
+  justify-content: center;
+}
+
 .character-option {
   background: var(--color-primary-dark);
   border: 3px solid #3a4a70;
@@ -371,6 +562,7 @@ button:hover { background: var(--color-accent-light); }
   cursor: pointer;
   transition: border-color 0.15s, transform 0.15s;
 }
+
 .character-option img {
   width: 64px;
   height: 64px;
@@ -379,8 +571,26 @@ button:hover { background: var(--color-accent-light); }
   image-rendering: pixelated;
   display: block;
 }
-.character-option:hover { transform: translateY(-2px); }
-.character-option.selected { border-color: var(--color-accent); box-shadow: 0 0 0 2px var(--color-accent); }
 
-#ranking-list-menu, #ranking-list-content { text-align: left; font-size: 10px; line-height: 2.1; margin-bottom: 10px; }
-#ranking-list-menu ol, #ranking-list-content ol { padding-left: 20px; margin: 0; }
+.character-option:hover {
+  transform: translateY(-2px);
+}
+
+.character-option.selected {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px var(--color-accent);
+}
+
+#ranking-list-menu,
+#ranking-list-content {
+  text-align: left;
+  font-size: 10px;
+  line-height: 2.1;
+  margin-bottom: 10px;
+}
+
+#ranking-list-menu ol,
+#ranking-list-content ol {
+  padding-left: 20px;
+  margin: 0;
+}
