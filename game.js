@@ -87,7 +87,7 @@ const PHASES = [
     groundColor: 0x2c3350,
     decorColor: 0x22304f,
     levelWidth: 1990,
-    bg: 'street_bg.png',
+    bg: 'street_bg.jpg',
     bossX: 1750,
     bossY: 460,
     doorX: 1770,
