@@ -83,11 +83,16 @@ const PHASES = [
   {
     id: 'fase1',
     name: 'Abrindo sua Empresa',
+    startX: 80,
+    startDirection: 'right',
+    hasBoss: true,
+    exitInitiallyOpen: false,
+
     skyColor: 0x18233d,
     groundColor: 0x2c3350,
     decorColor: 0x22304f,
     levelWidth: 1990,
-    bg: 'street_bg.jpg',
+    bg: 'street_bg.png',
     bossX: 1750,
     bossY: 460,
     doorX: 1770,
@@ -112,6 +117,13 @@ const PHASES = [
   {
     id: 'fase2',
     name: 'Organizando a Empresa',
+    startX: 80,
+    startDirection: 'right',
+    hasBoss: true,
+    exitInitiallyOpen: false,
+    showExitArrow: true,
+    exitDirection: 'backward', // seta aponta pra trás (saindo da empresa)
+
     skyColor: 0x18233d,
     groundColor: 0x2c3350,
     decorColor: 0x22304f,
@@ -121,8 +133,6 @@ const PHASES = [
     bossY: 290,
     doorX: 100,
     groundY: 400,
-    showExitArrow: true,
-    exitDirection: 'backward', // seta aponta pra trás (saindo da empresa)
     characterScale: 2.2,
     infoSpots: [
       { x: 195, y: 235, text: 'Olá, Seja bem vindo a Agência Sebrae RN.', textAfterBoss: 'Tchau! Foi um prazer te ajudar, volte sempre.', },
@@ -139,13 +149,72 @@ const PHASES = [
     },
   },
   {
+    id: 'fasetransicao',
+    name: 'Um Novo Caminho',
+    skyColor: 0x18233d,
+    groundColor: 0x2c3350,
+    decorColor: 0x22304f,
+    levelWidth: 1990,
+    bg: 'street_bg.png',
+    startX: 1790,
+    startDirection: 'left',
+    hasBoss: false,
+    exitInitiallyOpen: true,
+
+    doorX: 90,
+    groundY: 480,
+    showExitArrow: true,
+    exitDirection: 'backward', // seta aponta pra trás (saindo da empresa)
+    characterScale: 1.8,
+    infoSpots: [
+      { x: 1300, y: 320, text: 'Agora que sua empresa foi formalizada, é importante manter toda a documentação organizada.' },
+      { x: 820, y: 320, text: 'O acompanhamento contábil ajuda a empresa a crescer com mais segurança.' },
+      { x: 440, y: 340, text: 'O próximo passo é procurar uma contabilidade que acompanhe sua nova jornada.' },
+    ],
+  },
+  {
+    id: 'fasetransicao2',
+    name: 'Em Busca de Orientação',
+
+    skyColor: 0x18233d,
+    groundColor: 0x2c3350,
+    decorColor: 0x22304f,
+
+    levelWidth: 1990,
+    bg: 'street2_bg.png',
+
+    startX: 1880,
+    startDirection: 'left',
+
+    hasBoss: false,
+    exitInitiallyOpen: true,
+
+    doorX: 230,
+    groundY: 460,
+
+    showExitArrow: true,
+    exitDirection: 'backward',
+
+    characterScale: 1.8,
+
+    infoSpots: [
+      { x: 1400, y: 320, text: 'Com a empresa aberta, novos desafios começam a aparecer.' },
+      { x: 850, y: 320, text: 'Uma contabilidade próxima ajuda o empresário a compreender melhor os números do negócio.' },
+      { x: 420, y: 340, text: 'Você está chegando à JS Grilo Contabilidade & Gestão.' },
+    ],
+  },
+  {
     id: 'fase3',
-    name: 'Impostos e Reforma Tributária',
+    name: 'JS Grilo Contabilidade & Gestão',
+    startX: 80,
+    startDirection: 'right',
+    hasBoss: true,
+    exitInitiallyOpen: false,
     skyColor: 0x18233d,
     groundColor: 0x2c3350,
     decorColor: 0x22304f,
     levelWidth: 1994,
-    bg: 'office_bg.jpg', // nome do arquivo em assets/backgrounds/
+    bg: 'office_bg.png', // nome do arquivo em assets/backgrounds/
     // Posição do boss/porta nesta fase (em pixels, dentro da imagem de fundo de 2200x540).
     // Ajuste bossX/bossY livremente pra encaixar o boss na cadeira/mesa da sua arte.
     // bossY é a linha do "chão" onde os pés do boss encostam (mesma lógica do player).
@@ -797,18 +866,37 @@ class PhaseScene extends Phaser.Scene {
     // (cada uma tem fallback pro padrão, então é opcional definir por fase)
     const groundY = cfg.groundY ?? 460;
     const charScale = cfg.characterScale ?? CHARACTER_SCALE;
+    const startX = cfg.startX ?? 80;
+    const startDirection = cfg.startDirection ?? 'right';
 
-    this.player = this.physics.add.sprite(80, groundY, `char_${charId}_idle`, 0);
+    this.player = this.physics.add.sprite(
+      startX,
+      groundY,
+      `char_${charId}_idle`,
+      0
+    );
+
     this.player.setOrigin(0.5, 1);
-    this.player.body.setAllowGravity(false); // sem pulo — o personagem não precisa de gravidade
+    this.player.body.setAllowGravity(false);
     this.player.setSize(CHARACTER_BODY.width, CHARACTER_BODY.height);
-    this.player.body.setOffset(CHARACTER_BODY.offsetX, CHARACTER_BODY.offsetY);
+    this.player.body.setOffset(
+      CHARACTER_BODY.offsetX,
+      CHARACTER_BODY.offsetY
+    );
+
     this.player.setScale(charScale);
+    this.player.setFlipX(startDirection === 'left');
     this.player.setCollideWorldBounds(true);
     this.player.setDragX(900);
     this.player.setMaxVelocity(220, 0);
     this.player.anims.play(`${charId}_idle`);
-    this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
+
+    this.cameras.main.startFollow(
+      this.player,
+      true,
+      0.1,
+      0.1
+    );
 
     // Murais/quadros na parede (posição real do mundo — igual ao cálculo de proximidade)
     this.infoIcons = [];
@@ -836,46 +924,108 @@ class PhaseScene extends Phaser.Scene {
     this.infoSpots = cfg.infoSpots;
 
     // Boss no fim da fase (posição vem da config da fase — ver bossX/bossY em PHASES)
-    const bossX = cfg.bossX;
-    const bossY = cfg.bossY;
     const doorX = cfg.doorX;
-    this.bossSprite = this.add.image(bossX, bossY, 'bossTex').setOrigin(0.5, 1);
-    this.bossZone = this.add.zone(bossX, bossY, 70, 100);
-    this.physics.add.existing(this.bossZone, true);
+    const hasBoss = cfg.hasBoss !== false && cfg.boss;
+
     this.bossTriggered = false;
-    this.physics.add.overlap(this.player, this.bossZone, () => {
-      if (!this.bossTriggered && !GameData.paused) {
-        this.bossTriggered = true;
-        this.player.setVelocity(0, 0);
-        startBossBattle(this, cfg, this.bossSprite, () => this.onBossDefeated());
-      }
-    });
+
+    if (hasBoss) {
+      const bossX = cfg.bossX;
+      const bossY = cfg.bossY;
+
+      this.bossSprite = this.add
+        .image(bossX, bossY, 'bossTex')
+        .setOrigin(0.5, 1);
+
+      this.bossZone = this.add.zone(
+        bossX,
+        bossY,
+        70,
+        100
+      );
+
+      this.physics.add.existing(this.bossZone, true);
+
+      this.physics.add.overlap(
+        this.player,
+        this.bossZone,
+        () => {
+          if (!this.bossTriggered && !GameData.paused) {
+            this.bossTriggered = true;
+            this.player.setVelocity(0, 0);
+
+            startBossBattle(
+              this,
+              cfg,
+              this.bossSprite,
+              () => this.onBossDefeated()
+            );
+          }
+        }
+      );
+    }
 
     // Saída — seta dourada, só existe se a fase tiver uma (fase final não tem)
     if (cfg.showExitArrow !== false) {
       const exitY = groundY;
-      const arrowPointsLeft = (cfg.exitDirection || 'forward') === 'backward';
+      const arrowPointsLeft =
+        (cfg.exitDirection || 'forward') === 'backward';
 
-      this.door = this.add.text(doorX, exitY - 90, '➜', {
-        fontSize: '64px', fontStyle: 'bold', color: '#f2a900',
-      }).setOrigin(0.5).setFlipX(arrowPointsLeft).setVisible(false);
+      const exitStartsOpen = cfg.exitInitiallyOpen === true;
 
-      this.doorGlow = this.add.circle(doorX, exitY - 90, 46, THEME.accent, 0.25).setVisible(false);
+      this.doorGlow = this.add
+        .circle(
+          doorX,
+          exitY - 90,
+          46,
+          THEME.accent,
+          0.25
+        )
+        .setVisible(exitStartsOpen);
+
+      this.door = this.add
+        .text(
+          doorX,
+          exitY - 90,
+          '➜',
+          {
+            fontSize: '64px',
+            fontStyle: 'bold',
+            color: '#f2a900',
+          }
+        )
+        .setOrigin(0.5)
+        .setFlipX(arrowPointsLeft)
+        .setVisible(exitStartsOpen);
+
       this.tweens.add({
         targets: this.doorGlow,
-        scale: { from: 0.85, to: 1.15 }, alpha: { from: 0.15, to: 0.35 },
-        duration: 900, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
+        scale: {
+          from: 0.85,
+          to: 1.15,
+        },
+        alpha: {
+          from: 0.15,
+          to: 0.35,
+        },
+        duration: 900,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
       });
+
       this.tweens.add({
         targets: this.door,
         x: doorX + (arrowPointsLeft ? -12 : 12),
-        duration: 650, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
+        duration: 650,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
       });
 
-      // Checagem por distância (igual aos murais) — bem mais confiável que zona de física
       this.doorX = doorX;
       this.doorTriggerRadius = 70;
-      this.doorOpen = false;
+      this.doorOpen = exitStartsOpen;
     } else {
       this.doorOpen = false;
     }
