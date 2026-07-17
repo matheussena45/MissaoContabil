@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Empresário em Ação</title>
-<link rel="stylesheet" href="style.css" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.70.0/phaser.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Empresário em Ação</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.70.0/phaser.min.js"></script>
 </head>
+
 <body>
 
   <div id="game-wrapper">
@@ -17,14 +19,51 @@
       <div id="hud-left" class="hud-card">
         <div class="hud-card-top">
           <img id="hud-character-icon" src="assets/thumbnails/city_men_1.png" alt="Personagem" />
+
           <div id="hud-lives">❤️❤️❤️❤️❤️❤️</div>
         </div>
-        <div class="hud-card-row">🪙 <span id="score-value">0</span></div>
-        <div class="hud-card-row hud-small">Fase <span id="phase-value">1</span>/3 · 📖 <span id="hud-murais-count">0</span>/<span id="hud-murais-total">3</span></div>
+
+        <div class="hud-card-row">
+          🪙 <span id="score-value">0</span>
+        </div>
+
+        <div class="hud-card-row hud-phase-info">
+          <span id="phase-label">Fase 1</span>
+          <strong id="phase-name">Abrindo sua Empresa</strong>
+        </div>
+
+        <div class="hud-card-row hud-small">
+          📖
+          <span id="hud-murais-count">0</span>/
+          <span id="hud-murais-total">3</span>
+        </div>
       </div>
     </div>
 
-    <!-- Caixa de informação (murais/quadros) -->
+    <!-- Apresentação do título da fase -->
+    <div id="phase-intro" class="hidden">
+      <span id="phase-intro-label">Fase 1</span>
+      <strong id="phase-intro-name">
+        Abrindo sua Empresa
+      </strong>
+    </div>
+
+    <!-- Caixa narrativa das fases de transição -->
+    <div id="narrative-overlay" class="hidden">
+      <div id="narrative-box">
+        <div id="narrative-speaker">
+          📖 Narrador
+        </div>
+
+        <p id="narrative-text"></p>
+
+        <span id="narrative-continue">
+          Clique para continuar
+        </span>
+      </div>
+    </div>
+
+    <!-- Caixa de informação -->
     <div id="info-bubble" class="info-bubble-hidden">
       <span class="info-bubble-content"></span>
     </div>
@@ -121,11 +160,14 @@
           <h2>📋 Como jogar</h2>
           <ul>
             <li><strong>Mover:</strong> setas ← → (ou A/D)</li>
-            <li><strong>Objetivo:</strong> avance pelas 3 fases, leia os murais pelo caminho e vença os desafiadores no final de cada fase.</li>
-            <li><strong>Perguntas e chefes:</strong> ao chegar no chefe, o jogo pausa e aparecem 3 perguntas sorteadas sobre o tema da fase.</li>
+            <li><strong>Objetivo:</strong> avance pelas 3 fases, leia os murais pelo caminho e vença os desafiadores no
+              final de cada fase.</li>
+            <li><strong>Perguntas e chefes:</strong> ao chegar no chefe, o jogo pausa e aparecem 3 perguntas sorteadas
+              sobre o tema da fase.</li>
             <li><strong>Como vencer:</strong> complete as 3 fases sem ficar sem vidas.</li>
             <li><strong>Como perder:</strong> errar respostas custa vidas — ficar com 0 vidas encerra a aventura.</li>
-            <li><strong>Pontuação:</strong> baseada em respostas certas, vidas restantes e tempo total. Explorar os murais não pontua — é só pra aprender!</li>
+            <li><strong>Pontuação:</strong> baseada em respostas certas, vidas restantes e tempo total. Explorar os
+              murais não pontua — é só pra aprender!</li>
           </ul>
           <button class="back-btn" data-target="panel-menu">Voltar</button>
         </div>
@@ -133,14 +175,17 @@
         <!-- SOBRE A EMPRESA -->
         <div id="panel-empresa" class="menu-panel hidden">
           <h2>🏢 Sobre a Empresa</h2>
-          <p><em>EDITAR AQUI:</em> Nome do escritório de contabilidade, breve descrição da atuação, missão e diferenciais. Ex.: "A [Nome] Contabilidade ajuda empresários a organizarem suas empresas com clareza e segurança há X anos."</p>
+          <p><em>EDITAR AQUI:</em> Nome do escritório de contabilidade, breve descrição da atuação, missão e
+            diferenciais. Ex.: "A [Nome] Contabilidade ajuda empresários a organizarem suas empresas com clareza e
+            segurança há X anos."</p>
           <button class="back-btn" data-target="panel-menu">Voltar</button>
         </div>
 
         <!-- CRIADOR -->
         <div id="panel-criador" class="menu-panel hidden">
           <h2>👤 Criador</h2>
-          <p><em>EDITAR AQUI:</em> Seu nome, seu papel na criação do jogo e uma frase curta sobre a motivação do projeto.</p>
+          <p><em>EDITAR AQUI:</em> Seu nome, seu papel na criação do jogo e uma frase curta sobre a motivação do
+            projeto.</p>
           <button class="back-btn" data-target="panel-menu">Voltar</button>
         </div>
 
@@ -150,4 +195,5 @@
 
   <script src="game.js"></script>
 </body>
+
 </html>

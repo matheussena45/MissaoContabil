@@ -13,7 +13,8 @@ const MAX_LIVES = 6;
 const INFO_PROXIMITY_RADIUS = 90; // px — raio em que o mural fica visível
 const ANSWER_SECONDS = 30;  // tempo pra responder depois que as alternativas aparecem
 const ONCE_BUBBLE_MIN_MS = 4500; // tempo mínimo que um mural "de uso único" fica aberto, mesmo andando
-
+const NARRATIVE_TYPE_SPEED_MS = 35;
+const NARRATIVE_DEFAULT_DURATION_MS = 4000;
 // ---------------------------------------------------------
 // TEMA / IDENTIDADE VISUAL (deve bater com :root em style.css)
 // ---------------------------------------------------------
@@ -87,7 +88,8 @@ const PHASES = [
     startDirection: 'right',
     hasBoss: true,
     exitInitiallyOpen: false,
-
+    phaseNumber: 1,
+    phaseLabel: 'Fase 1',
     skyColor: 0x18233d,
     groundColor: 0x2c3350,
     decorColor: 0x22304f,
@@ -123,7 +125,8 @@ const PHASES = [
     exitInitiallyOpen: false,
     showExitArrow: true,
     exitDirection: 'backward', // seta aponta pra trás (saindo da empresa)
-
+    phaseNumber: 2,
+    phaseLabel: 'Fase 2',
     skyColor: 0x18233d,
     groundColor: 0x2c3350,
     decorColor: 0x22304f,
@@ -150,7 +153,9 @@ const PHASES = [
   },
   {
     id: 'fasetransicao',
-    name: 'Um Novo Caminho',
+    name: 'O Início de uma Nova Jornada',
+    phaseNumber: 2,
+    phaseLabel: 'Interlúdio',
     skyColor: 0x18233d,
     groundColor: 0x2c3350,
     decorColor: 0x22304f,
@@ -160,12 +165,24 @@ const PHASES = [
     startDirection: 'left',
     hasBoss: false,
     exitInitiallyOpen: true,
-
     doorX: 90,
     groundY: 480,
     showExitArrow: true,
     exitDirection: 'backward', // seta aponta pra trás (saindo da empresa)
     characterScale: 1.8,
+
+    narrative: [
+      {
+        type: 'narrator',
+        text: 'Após concluir o processo de formalização, a empresa finalmente estava pronta para começar.',
+        duration: 4000,
+      },
+      {
+        type: 'player',
+        text: 'Pronto! Meu CNPJ está aberto. Agora vamos pra cima!',
+        duration: 4000,
+      },
+    ],
     infoSpots: [
       { x: 1300, y: 320, text: 'Agora que sua empresa foi formalizada, é importante manter toda a documentação organizada.' },
       { x: 820, y: 320, text: 'O acompanhamento contábil ajuda a empresa a crescer com mais segurança.' },
@@ -174,29 +191,46 @@ const PHASES = [
   },
   {
     id: 'fasetransicao2',
-    name: 'Em Busca de Orientação',
-
+    name: 'Novos Desafios',
+    phaseNumber: 2,
+    phaseLabel: 'Algum tempo depois',
     skyColor: 0x18233d,
     groundColor: 0x2c3350,
     decorColor: 0x22304f,
-
     levelWidth: 1990,
     bg: 'street2_bg.png',
-
     startX: 1880,
     startDirection: 'left',
-
     hasBoss: false,
     exitInitiallyOpen: true,
-
     doorX: 230,
     groundY: 460,
-
     showExitArrow: true,
     exitDirection: 'backward',
-
     characterScale: 1.8,
 
+    narrative: [
+      {
+        type: 'narrator',
+        text: 'Algum tempo depois...',
+        duration: 3000,
+      },
+      {
+        type: 'narrator',
+        text: 'A empresa começou a crescer. Novos clientes chegaram e as responsabilidades aumentaram.',
+        duration: 5000,
+      },
+      {
+        type: 'player',
+        text: 'Minha empresa está crescendo, mas preciso de ajuda para organizar tudo.',
+        duration: 4500,
+      },
+      {
+        type: 'player',
+        text: 'Ouvi falar muito bem da JS Grilo Contabilidade & Gestão. Vou procurar a equipe deles.',
+        duration: 5500,
+      },
+    ],
     infoSpots: [
       { x: 1400, y: 320, text: 'Com a empresa aberta, novos desafios começam a aparecer.' },
       { x: 850, y: 320, text: 'Uma contabilidade próxima ajuda o empresário a compreender melhor os números do negócio.' },
@@ -210,6 +244,8 @@ const PHASES = [
     startDirection: 'right',
     hasBoss: true,
     exitInitiallyOpen: false,
+    phaseNumber: 3,
+    phaseLabel: 'Fase 3',
     skyColor: 0x18233d,
     groundColor: 0x2c3350,
     decorColor: 0x22304f,
@@ -254,12 +290,26 @@ function pickRandom(arr, n) {
 }
 
 function updateHUD() {
-  document.getElementById('hud-lives').textContent = '❤️'.repeat(Math.max(GameData.lives, 0)) || '💀';
-  // Placar parcial em tempo real, usando os mesmos critérios da pontuação final
-  // (tempo ainda não entra aqui pra não ficar mudando sozinho a cada segundo na tela).
-  const partialScore = GameData.correctAnswers * 100 + GameData.lives * 150;
-  document.getElementById('score-value').textContent = partialScore;
-  document.getElementById('phase-value').textContent = GameData.phaseIndex + 1;
+  document.getElementById('hud-lives').textContent =
+    '❤️'.repeat(Math.max(GameData.lives, 0)) || '💀';
+
+  const partialScore =
+    GameData.correctAnswers * 100 +
+    GameData.lives * 150;
+
+  document.getElementById('score-value').textContent =
+    partialScore;
+
+  const currentPhase = PHASES[GameData.phaseIndex];
+
+  if (!currentPhase) return;
+
+  document.getElementById('phase-label').textContent =
+    currentPhase.phaseLabel ??
+    `Fase ${currentPhase.phaseNumber ?? GameData.phaseIndex + 1}`;
+
+  document.getElementById('phase-name').textContent =
+    currentPhase.name;
 }
 
 // Conta quantos murais da fase atual já foram vistos (só estatística/flavor, não pontua)
@@ -778,6 +828,321 @@ function updateInfoBubble(scene, playerX, infoSpots, phaseId, infoIcons) {
 // ---------------------------------------------------------
 // CENA PRINCIPAL DO PHASER
 // ---------------------------------------------------------
+function showPhaseIntro(phaseConfig, onComplete) {
+  const intro = document.getElementById('phase-intro');
+  const label = document.getElementById('phase-intro-label');
+  const name = document.getElementById('phase-intro-name');
+
+  label.textContent =
+    phaseConfig.phaseLabel ??
+    `Fase ${phaseConfig.phaseNumber ?? ''}`;
+
+  name.textContent = phaseConfig.name;
+
+  intro.classList.remove(
+    'hidden',
+    'phase-intro-visible'
+  );
+
+  void intro.offsetWidth;
+
+  intro.classList.add('phase-intro-visible');
+
+  setTimeout(() => {
+    intro.classList.add('hidden');
+    intro.classList.remove('phase-intro-visible');
+
+    if (onComplete) onComplete();
+  }, 2600);
+}
+
+// ---------------------------------------------------------
+// NARRATIVA DAS FASES DE TRANSIÇÃO
+//
+// - Bloqueia o movimento durante as falas.
+// - Digita o texto letra por letra.
+// - Um clique completa a digitação.
+// - Outro clique avança para a próxima fala.
+// - Também avança automaticamente após o duration.
+// ---------------------------------------------------------
+function startNarrative(scene, narrative, onComplete) {
+  if (!Array.isArray(narrative) || narrative.length === 0) {
+    scene.inputManager.setEnabled(true);
+
+    if (onComplete) {
+      onComplete();
+    }
+
+    return;
+  }
+
+  const mySession = GameData.sessionId;
+
+  const overlay = document.getElementById('narrative-overlay');
+  const box = document.getElementById('narrative-box');
+  const speakerEl = document.getElementById('narrative-speaker');
+  const textEl = document.getElementById('narrative-text');
+  const continueEl = document.getElementById('narrative-continue');
+
+  let dialogueIndex = 0;
+  let typeInterval = null;
+  let autoAdvanceTimeout = null;
+
+  let isTyping = false;
+  let currentText = '';
+  let currentCharIndex = 0;
+  let currentDialogueFinished = false;
+  let narrativeFinished = false;
+
+  function isStale() {
+    return (
+      mySession !== GameData.sessionId ||
+      !scene.scene.isActive()
+    );
+  }
+
+  function clearNarrativeTimers() {
+    clearInterval(typeInterval);
+    clearTimeout(autoAdvanceTimeout);
+
+    typeInterval = null;
+    autoAdvanceTimeout = null;
+  }
+
+  function getSpeaker(dialogue) {
+    if (dialogue.type === 'player') {
+      return `💬 ${GameData.playerName}`;
+    }
+
+    return '📖 Narrador';
+  }
+
+  function applyDialogueStyle(dialogue) {
+    box.classList.remove(
+      'player-dialogue',
+      'narrator-dialogue'
+    );
+
+    if (dialogue.type === 'player') {
+      box.classList.add('player-dialogue');
+    } else {
+      box.classList.add('narrator-dialogue');
+    }
+  }
+
+  function completeTyping() {
+    if (!isTyping) {
+      return;
+    }
+
+    clearInterval(typeInterval);
+    typeInterval = null;
+
+    textEl.textContent = currentText;
+    currentCharIndex = currentText.length;
+
+    isTyping = false;
+    currentDialogueFinished = true;
+
+    continueEl.classList.add('visible');
+
+    scheduleAutoAdvance();
+  }
+
+  function scheduleAutoAdvance() {
+    clearTimeout(autoAdvanceTimeout);
+
+    const dialogue = narrative[dialogueIndex];
+
+    const duration =
+      dialogue.duration ??
+      NARRATIVE_DEFAULT_DURATION_MS;
+
+    autoAdvanceTimeout = setTimeout(() => {
+      if (isStale() || narrativeFinished) {
+        return;
+      }
+
+      goToNextDialogue();
+    }, duration);
+  }
+
+  function typeDialogueText(text) {
+    clearInterval(typeInterval);
+    clearTimeout(autoAdvanceTimeout);
+
+    currentText = text;
+    currentCharIndex = 0;
+    currentDialogueFinished = false;
+    isTyping = true;
+
+    textEl.textContent = '';
+    continueEl.classList.remove('visible');
+
+    typeInterval = setInterval(() => {
+      if (isStale()) {
+        clearNarrativeTimers();
+        return;
+      }
+
+      currentCharIndex += 1;
+
+      textEl.textContent = currentText.slice(
+        0,
+        currentCharIndex
+      );
+
+      if (currentCharIndex >= currentText.length) {
+        clearInterval(typeInterval);
+        typeInterval = null;
+
+        isTyping = false;
+        currentDialogueFinished = true;
+
+        continueEl.classList.add('visible');
+
+        scheduleAutoAdvance();
+      }
+    }, NARRATIVE_TYPE_SPEED_MS);
+  }
+
+  function showDialogue(index) {
+    if (isStale() || narrativeFinished) {
+      return;
+    }
+
+    const dialogue = narrative[index];
+
+    if (!dialogue) {
+      finishNarrative();
+      return;
+    }
+
+    applyDialogueStyle(dialogue);
+
+    speakerEl.textContent = getSpeaker(dialogue);
+
+    /*
+     * Permite usar {playerName} dentro do próprio texto,
+     * caso você queira citar o jogador na frase.
+     */
+    const resolvedText = String(dialogue.text ?? '')
+      .replaceAll('{playerName}', GameData.playerName);
+
+    typeDialogueText(resolvedText);
+  }
+
+  function goToNextDialogue() {
+    if (isStale() || narrativeFinished) {
+      return;
+    }
+
+    clearNarrativeTimers();
+
+    dialogueIndex += 1;
+
+    if (dialogueIndex >= narrative.length) {
+      finishNarrative();
+      return;
+    }
+
+    showDialogue(dialogueIndex);
+  }
+
+  function handleNarrativeClick() {
+    if (isStale() || narrativeFinished) {
+      return;
+    }
+
+    /*
+     * Primeiro clique:
+     * completa imediatamente o texto.
+     */
+    if (isTyping) {
+      completeTyping();
+      return;
+    }
+
+    /*
+     * Segundo clique:
+     * avança para a próxima fala.
+     */
+    if (currentDialogueFinished) {
+      goToNextDialogue();
+    }
+  }
+
+  function finishNarrative() {
+    if (narrativeFinished) {
+      return;
+    }
+
+    narrativeFinished = true;
+
+    clearNarrativeTimers();
+
+    overlay.removeEventListener(
+      'click',
+      handleNarrativeClick
+    );
+
+    overlay.classList.add('hidden');
+
+    box.classList.remove(
+      'player-dialogue',
+      'narrator-dialogue'
+    );
+
+    speakerEl.textContent = '';
+    textEl.textContent = '';
+    continueEl.classList.remove('visible');
+
+    /*
+     * Só libera o jogador se esta ainda for
+     * a mesma partida/cena.
+     */
+    if (!isStale()) {
+      scene.inputManager.setEnabled(true);
+    }
+
+    if (onComplete && !isStale()) {
+      onComplete();
+    }
+  }
+
+  // Impede que o personagem continue deslizando.
+  scene.player.setVelocityX(0);
+
+  // Bloqueia o teclado enquanto a narrativa ocorre.
+  scene.inputManager.setEnabled(false);
+
+  overlay.classList.remove('hidden');
+
+  overlay.addEventListener(
+    'click',
+    handleNarrativeClick
+  );
+
+  /*
+   * Quando a cena for encerrada ou reiniciada,
+   * remove timers e eventos da narrativa.
+   */
+  scene.events.once('shutdown', () => {
+    narrativeFinished = true;
+
+    clearNarrativeTimers();
+
+    overlay.removeEventListener(
+      'click',
+      handleNarrativeClick
+    );
+
+    overlay.classList.add('hidden');
+  });
+
+  showDialogue(dialogueIndex);
+}
+
 class PhaseScene extends Phaser.Scene {
   constructor() { super('PhaseScene'); }
 
@@ -1032,12 +1397,26 @@ class PhaseScene extends Phaser.Scene {
 
     this.phaseTransitioning = false; // trava pra não disparar a troca de fase várias vezes seguidas
 
-    // Sistema de input (teclado por padrão; pronto para touch/gamepad no futuro)
-    this.inputManager = new InputManager(this);
+    // Sistema de input
+this.inputManager = new InputManager(this);
 
-    this.levelWidth = cfg.levelWidth;
-    updateHUD();
-    updateMuraisCounter(cfg.id, cfg.infoSpots.length);
+this.levelWidth = cfg.levelWidth;
+
+updateHUD();
+updateMuraisCounter(cfg.id, cfg.infoSpots.length);
+
+// Bloqueia o personagem durante o título
+this.inputManager.setEnabled(false);
+
+// Apresentação do capítulo
+showPhaseIntro(cfg, () => {
+  if (cfg.narrative?.length) {
+    startNarrative(this, cfg.narrative);
+  } else {
+    this.inputManager.setEnabled(true);
+  }
+});
+
   }
 
   onBossDefeated() {
@@ -1088,6 +1467,21 @@ class PhaseScene extends Phaser.Scene {
         this.phaseTransitioning = true;
         this.goToNextPhase();
       }
+    }
+
+    if (!this.inputManager.enabled) {
+      this.player.setVelocityX(0);
+
+      const idleAnim =
+        `${GameData.selectedCharacter}_idle`;
+
+      if (
+        this.player.anims.currentAnim?.key !== idleAnim
+      ) {
+        this.player.anims.play(idleAnim, true);
+      }
+
+      return;
     }
 
     const charId = GameData.selectedCharacter;

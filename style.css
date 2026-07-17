@@ -55,6 +55,29 @@ body {
 }
 
 /* ---------- HUD ---------- */
+
+.hud-phase-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 8px;
+  padding-top: 7px;
+  border-top: 1px solid rgba(242, 169, 0, 0.35);
+}
+
+#phase-label {
+  color: var(--color-accent-light);
+  font-size: 7px;
+  opacity: 0.85;
+}
+
+#phase-name {
+  color: var(--color-accent);
+  font-size: 8px;
+  line-height: 1.5;
+  max-width: 210px;
+}
+
 #hud {
   position: absolute;
   top: 12px;
@@ -108,6 +131,70 @@ body {
 .hud-small {
   font-size: 8px;
   opacity: 0.85;
+}
+
+/* ---------- Apresentação da fase ---------- */
+#phase-intro {
+  position: absolute;
+  left: 50%;
+  top: 72px;
+  transform: translateX(-50%);
+
+  min-width: 340px;
+  max-width: 600px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+
+  background: rgba(11, 21, 38, 0.92);
+  border: 3px solid var(--color-accent);
+  border-radius: 10px;
+  padding: 14px 24px;
+
+  text-align: center;
+  pointer-events: none;
+  z-index: 15;
+
+  box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.35);
+}
+
+#phase-intro-label {
+  color: var(--color-accent-light);
+  font-size: 8px;
+}
+
+#phase-intro-name {
+  color: var(--color-cream);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+#phase-intro.phase-intro-visible {
+  animation: phaseIntroAnimation 2.6s ease forwards;
+}
+
+@keyframes phaseIntroAnimation {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -12px);
+  }
+
+  15% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  75% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -10px);
+  }
 }
 
 /* ---------- Balão de informação (mural/quadro) ---------- */
@@ -187,6 +274,129 @@ body {
   100% {
     opacity: 1;
     transform: translate(-50%, -100%) scale(1);
+  }
+}
+
+/* =========================================================
+   NARRATIVA DAS TRANSIÇÕES
+   ========================================================= */
+
+#narrative-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 18;
+
+  /*
+   * Captura o clique durante a narrativa,
+   * impedindo interação acidental com outros elementos.
+   */
+  pointer-events: auto;
+}
+
+#narrative-box {
+  position: absolute;
+  top: 76px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: 580px;
+  max-width: calc(100% - 60px);
+  min-height: 118px;
+
+  background: rgba(11, 21, 38, 0.94);
+  border: 3px solid var(--color-accent);
+  border-radius: 12px;
+
+  padding: 22px 24px 18px;
+
+  box-shadow:
+    6px 6px 0 rgba(0, 0, 0, 0.42),
+    inset 0 0 0 2px rgba(255, 226, 122, 0.08);
+
+  animation: narrativeBoxOpen 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#narrative-speaker {
+  display: inline-block;
+
+  margin-bottom: 14px;
+  padding: 7px 12px;
+
+  background: var(--color-primary);
+  border: 2px solid var(--color-accent);
+  border-radius: 20px;
+
+  color: var(--color-accent-light);
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+#narrative-text {
+  min-height: 42px;
+
+  margin: 0;
+  color: var(--color-cream);
+
+  font-size: 11px;
+  line-height: 1.8;
+  text-align: left;
+}
+
+#narrative-continue {
+  display: block;
+
+  margin-top: 13px;
+
+  color: var(--color-accent-light);
+  font-size: 7px;
+  line-height: 1.5;
+  text-align: right;
+
+  opacity: 0;
+}
+
+#narrative-continue.visible {
+  opacity: 0.8;
+  animation: narrativeContinueBlink 1s infinite;
+}
+
+/* Visual diferente para a fala do personagem */
+#narrative-box.player-dialogue {
+  border-color: var(--color-accent-light);
+}
+
+#narrative-box.player-dialogue #narrative-speaker {
+  background: var(--color-accent);
+  border-color: var(--color-accent-light);
+  color: var(--color-primary-dark);
+}
+
+/* Visual mais neutro para o narrador */
+#narrative-box.narrator-dialogue {
+  border-color: var(--color-accent);
+}
+
+@keyframes narrativeBoxOpen {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -18px) scale(0.94);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+@keyframes narrativeContinueBlink {
+
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+
+  50% {
+    opacity: 1;
   }
 }
 
