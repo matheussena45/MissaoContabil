@@ -447,7 +447,7 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  width: 260px;
+  width: 340px;
   margin-bottom: 22px;
   /* mais respiro entre o balão e a cabeça do boss */
 }

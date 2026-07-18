@@ -96,23 +96,164 @@ const PHASES = [
     levelWidth: 1990,
     bg: 'street_bg.png',
     bossX: 1750,
-    bossY: 460,
+    bossY: 478,
     doorX: 1770,
     groundY: 480,
     showExitArrow: true,
     exitDirection: 'forward', // seta aponta pra frente
     characterScale: 1.8,
     infoSpots: [
-      { x: 440, y: 340, text: 'Nota fiscal registra a venda oficialmente — evita problemas com o fisco e passa confiança ao cliente.' },
-      { x: 820, y: 320, text: 'A reforma tributária vai unificar vários impostos em dois: CBS e IBS.' },
-      { x: 1300, y: 320, text: 'Planejamento tributário legal ajuda a pagar só o imposto necessário, dentro da lei.' },
+      { x: 440, y: 340, text: 'Se você está começando um negócio, lembre-se: organizar tudo desde o início evita muita dor de cabeça no futuro.' },
+      { x: 820, y: 320, text: 'Muita gente acha que abrir uma empresa é só conseguir um CNPJ, mas existem outras responsabilidades importantes.' },
+      { x: 1300, y: 320, text: 'Cada decisão tomada no início da empresa pode fazer diferença lá na frente. Vale a pena conhecer bem cada etapa.' },
     ],
     boss: {
-      name: 'Guardião da Reforma Tributária',
+      name: 'Analista do Sebrae',
+      portrait: { idle: 'boss1_idle.png', talk: 'boss1_talk.png' },
+      portraitHeight: 130, // corpo inteiro — maior que os outros dois (retrato busto)
+      portraitFlip: true,
+      greeting: 'Olá!Me chamo Franciel Monte, sou o Analista do Sebrae. Antes de você seguir sua jornada, vou ver o que você já aprendeu sobre abrir uma empresa!',
+      introLines: [
+        'Vamos lá, primeira pergunta:',
+        'Show de bola! Próxima:',
+        'Última pergunta, capricha:',
+      ],
+      correctLines: [
+        'Isso aí! Você manda bem.',
+        'Perfeito, é exatamente isso!',
+        'Excelente! Já sei que você vai longe.',
+      ],
+      wrongLines: [
+        'Ops, não foi dessa vez.',
+        'Quase! Deixa eu te explicar:',
+        'Essa pega muita gente, mas vamos entender:',
+      ],
+      resultMessages: {
+        3: 'Mandou muito bem, acertou todas! Pode seguir em frente com confiança.',
+        2: 'Muito bom! Só um detalhezinho pra revisar, mas já está no caminho certo.',
+        1: 'Você começou bem, mas vale revisar esses conceitos com calma.',
+        0: 'Não foi dessa vez, mas o importante é continuar aprendendo. Vamos em frente!',
+      },
       questions: [
-        { q: 'Para que serve emitir nota fiscal?', options: ['Só para o cliente ter um papel', 'Para registrar a venda oficialmente e evitar problemas', 'Não é importante para pequenas empresas', 'É opcional em qualquer venda'], correct: 1, explanation: 'A nota fiscal formaliza a venda perante o fisco e transmite mais confiança e segurança ao cliente.' },
-        { q: 'A reforma tributária vai unificar vários tributos em quais siglas?', options: ['ICMS e ISS', 'CBS e IBS', 'IPTU e IPVA', 'INSS e FGTS'], correct: 1, explanation: 'A reforma cria a CBS (federal) e o IBS (estadual/municipal), substituindo vários tributos atuais.' },
-        { q: 'O que é planejamento tributário (feito de forma legal)?', options: ['Sonegar imposto', 'Organizar a empresa para pagar só o imposto devido, dentro da lei', 'Atrasar pagamentos de propósito', 'Um tipo de empréstimo bancário'], correct: 1, explanation: 'Planejamento tributário legal significa estruturar a empresa para não pagar mais imposto do que o necessário, sempre dentro da lei.' },
+        {
+          q: "Para que serve o CNPJ?",
+          options: [
+            'É o "documento de identidade" da empresa, usado para ela existir oficialmente perante o governo',
+            'É o número utilizado pelo banco para identificar a principal conta financeira da empresa e registrar suas movimentações',
+            'É um selo de qualidade concedido pelos órgãos públicos às empresas que cumprem todos os requisitos legais',
+            'É um documento que substitui o CPF do proprietário em qualquer operação realizada pela empresa'
+          ],
+          correct: 0,
+          explanation: "O CNPJ é como o documento de identidade da empresa. É por meio dele que ela existe oficialmente perante o governo e pode exercer suas atividades de forma legal."
+        },
+
+        {
+          q: "O que é o MEI (Microempreendedor Individual)?",
+          options: [
+            'Uma linha de crédito criada por bancos públicos para incentivar pequenos empreendedores no início do negócio',
+            'Um jeito simples e barato de formalizar um pequeno negócio, como autônomo',
+            'Um tipo de imposto pago mensalmente por empresas que possuem apenas um funcionário registrado',
+            'Um curso obrigatório oferecido pelo governo antes da abertura de qualquer empresa no Brasil'
+          ],
+          correct: 1,
+          explanation: "O MEI foi criado para facilitar a formalização de pequenos empreendedores, permitindo que trabalhem legalmente, tenham CNPJ e possam emitir nota fiscal."
+        },
+
+        {
+          q: "Depois de formalizar a empresa, o que ela passa a ter direito/dever de fazer?",
+          options: [
+            'Ficar permanentemente isenta do pagamento de impostos e demais obrigações fiscais previstas em lei',
+            'Emitir nota fiscal e pagar os impostos e taxas devidos',
+            'Deixar de prestar informações ao governo porque a empresa já está oficialmente registrada',
+            'Contratar funcionários imediatamente, independentemente do porte ou da necessidade do negócio'
+          ],
+          correct: 1,
+          explanation: "Ao formalizar uma empresa, ela ganha direitos, como emitir nota fiscal, mas também assume responsabilidades, como cumprir suas obrigações fiscais."
+        },
+
+        {
+          q: "O que significa a razão social de uma empresa?",
+          options: [
+            'O nome utilizado pela empresa em campanhas publicitárias, redes sociais e materiais de divulgação',
+            'O nome oficial e completo da empresa, registrado nos documentos legais',
+            'O endereço comercial informado no cadastro da prefeitura durante a abertura da empresa',
+            'O valor do patrimônio inicial declarado pelos sócios no momento da constituição da empresa'
+          ],
+          correct: 1,
+          explanation: "A razão social é o nome oficial registrado nos documentos da empresa. Já o nome fantasia é aquele que os clientes costumam conhecer."
+        },
+
+        {
+          q: "O que geralmente é necessário para abrir uma conta bancária no nome da empresa (conta PJ)?",
+          options: [
+            'Somente o CPF do proprietário e um comprovante atualizado de residência em seu nome',
+            'O CNPJ da empresa e os documentos de constituição dela',
+            'Um comprovante demonstrando que a empresa já obteve lucro suficiente para movimentar uma conta empresarial',
+            'Uma autorização emitida pelo contador responsável confirmando que a empresa está apta para abrir conta'
+          ],
+          correct: 1,
+          explanation: "Antes de abrir uma conta empresarial, o banco precisa confirmar que a empresa existe oficialmente, por isso solicita o CNPJ e os documentos da empresa."
+        },
+
+        {
+          q: "Por que a maioria das empresas contrata um contador?",
+          options: [
+            'Porque toda empresa, independentemente do porte, é obrigada por lei a possuir um contador exclusivo em tempo integral',
+            'Para cuidar de obrigações fiscais, contábeis e trabalhistas que a lei exige',
+            'Porque somente um contador possui autorização legal para emitir notas fiscais em nome da empresa',
+            'Para assumir as decisões administrativas e financeiras que normalmente seriam tomadas pelos sócios'
+          ],
+          correct: 1,
+          explanation: "O contador auxilia a empresa a cumprir suas obrigações legais, organizar as finanças e evitar problemas com o Fisco."
+        },
+
+        {
+          q: "De forma simples, o que é o regime tributário de uma empresa?",
+          options: [
+            'O conjunto de horários e regras que determina quando uma empresa pode funcionar legalmente',
+            'O conjunto de regras que define como e quanto a empresa vai pagar de impostos',
+            'A classificação utilizada pelo governo para definir quais produtos uma empresa está autorizada a vender',
+            'O limite máximo de sócios permitido para cada empresa de acordo com sua atividade econômica'
+          ],
+          correct: 1,
+          explanation: "O regime tributário funciona como um conjunto de regras que define a forma de cálculo e o pagamento dos impostos da empresa."
+        },
+
+        {
+          q: "Por que é importante guardar notas fiscais e comprovantes de gastos da empresa?",
+          options: [
+            'Depois da compra esses documentos podem ser descartados, pois ficam registrados automaticamente no governo',
+            'Servem para comprovar despesas, ajudar no controle financeiro e evitar problemas com o Fisco',
+            'São utilizados apenas para organizar os arquivos físicos da empresa e facilitar consultas internas',
+            'Têm utilidade apenas quando é necessário solicitar a troca de um produto adquirido pela empresa'
+          ],
+          correct: 1,
+          explanation: "Esses documentos registram tudo o que entra e sai da empresa, facilitando o controle financeiro e comprovando despesas quando necessário."
+        },
+
+        {
+          q: "O que pode acontecer se a empresa não pagar os impostos em dia?",
+          options: [
+            'Os impostos podem ser pagos a qualquer momento sem cobrança adicional, desde que sejam quitados no mesmo ano',
+            'A empresa pode ser multada, ter juros sobre o valor devido e até ficar com restrições (como negativação)',
+            'O governo costuma cancelar automaticamente os débitos após determinado período sem necessidade de pagamento',
+            'O contador responsável assume legalmente a dívida e realiza o pagamento em nome da empresa'
+          ],
+          correct: 1,
+          explanation: "Assim como qualquer conta em atraso, impostos não pagos podem gerar multas, juros e outras restrições para a empresa."
+        },
+
+        {
+          q: "O que é o alvará de funcionamento?",
+          options: [
+            'Um documento que autoriza a empresa a funcionar naquele endereço, emitido pela prefeitura',
+            'O comprovante oficial de pagamento das contribuições mensais realizadas pelo Microempreendedor Individual',
+            'Um seguro obrigatório contratado para proteger a empresa contra multas e fiscalizações municipais',
+            'O contrato firmado entre os sócios definindo as responsabilidades administrativas de cada participante'
+          ],
+          correct: 0,
+          explanation: "O alvará é a autorização concedida pela prefeitura para que a empresa possa exercer suas atividades legalmente naquele endereço."
+        }
       ],
     },
   },
@@ -132,22 +273,172 @@ const PHASES = [
     decorColor: 0x22304f,
     levelWidth: 1990,
     bg: 'agencia_bg.png',
-    bossX: 1790,
-    bossY: 290,
+    bossX: 1785,
+    bossY: 292,
     doorX: 100,
     groundY: 400,
     characterScale: 2.2,
     infoSpots: [
-      { x: 195, y: 235, text: 'Olá, Seja bem vindo a Agência Sebrae RN.', textAfterBoss: 'Tchau! Foi um prazer te ajudar, volte sempre.', },
-      { x: 700, y: 245, text: 'Pró-labore é o salário do dono — separar isso do lucro da empresa evita confusão financeira.', once: true, },
-      { x: 1400, y: 255, text: 'Misturar conta pessoal com conta da empresa é um dos erros mais comuns de quem começa.', once: true, },
+      { x: 195, y: 235, text: 'Olá! Seja muito bem-vindo ao Sebrae. Estamos felizes em ajudar você nessa nova etapa da sua empresa.', textAfterBoss: 'Tchau! Foi um prazer te ajudar, volte sempre.', },
+      { x: 700, y: 245, text: 'Uma empresa organizada acompanha suas finanças e mantém seus documentos sempre em dia.', once: true, },
+      { x: 1400, y: 255, text: 'Controlar receitas, despesas e impostos ajuda o empresário a tomar decisões muito mais seguras.', once: true, },
     ],
     boss: {
-      name: 'Fiscalizador das Finanças',
+      name: 'Gerente do Sebrae',
+      portrait: { idle: 'boss2_idle.png', talk: 'boss2_talk.png' },
+      portraitHeight: 90,
+      greeting: 'Seja bem-vindo ao Sebrae RN. Meu nome é Leonel Pontes, sou o responsável por este escritório. Antes de prosseguirmos, gostaria de avaliar seus conhecimentos sobre a organização financeira de uma empresa.',
+      introLines: [
+        'Vamos à primeira questão:',
+        'Muito bem. Sigamos para a próxima:',
+        'Última questão — atenção redobrada aqui:',
+      ],
+      correctLines: [
+        'Correto. Você demonstra bom entendimento do assunto.',
+        'Exatamente isso. Prossigamos.',
+        'Resposta precisa. Muito bem.',
+      ],
+      wrongLines: [
+        'Não é bem assim. Deixe-me esclarecer:',
+        'Esse é um ponto que exige atenção. Veja bem:',
+        'Vamos revisar esse conceito com calma:',
+      ],
+      resultMessages: {
+        3: 'Desempenho excelente. Você demonstrou domínio sólido sobre organização financeira e tributária.',
+        2: 'Bom resultado. Você já tem uma base sólida, mas ainda há pontos importantes para aprofundar.',
+        1: 'Você acertou parte dos conceitos, mas ainda vale revisar alguns pontos importantes para a gestão do seu negócio.',
+        0: 'Esses conceitos ainda precisam de mais atenção. Estudar um pouco mais fará toda a diferença na gestão da sua empresa.',
+      },
       questions: [
-        { q: 'O que é fluxo de caixa?', options: ['O lucro anual da empresa', 'O controle de entradas e saídas de dinheiro', 'Um tipo de imposto', 'O valor do capital social'], correct: 1, explanation: 'Fluxo de caixa mostra tudo que entra e sai da empresa, ajudando a saber se sobra ou falta dinheiro no mês.' },
-        { q: 'O que é pró-labore?', options: ['O lucro repartido entre sócios no fim do ano', 'A remuneração do dono pelo trabalho na empresa', 'Um imposto sobre vendas', 'Um tipo de empréstimo'], correct: 1, explanation: 'Pró-labore é o "salário" do sócio que trabalha na empresa, separado do lucro do negócio.' },
-        { q: 'Por que separar conta pessoal da conta da empresa?', options: ['Não faz diferença nenhuma', 'Para evitar confusão e problemas financeiros/fiscais', 'Só é exigido para empresas grandes', 'Para pagar menos imposto automaticamente'], correct: 1, explanation: 'Misturar contas dificulta saber a real saúde financeira da empresa e pode gerar problemas contábeis e fiscais.' },
+        {
+          q: "Todo mês ou trimestre, a empresa recolhe seus impostos por meio de uma guia. Para que serve essa guia?",
+          options: [
+            "É o comprovante utilizado para registrar oficialmente o pagamento dos tributos devidos pela empresa naquele período",
+            "É um boleto emitido automaticamente apenas quando a empresa atrasa o pagamento de algum imposto",
+            "É um documento interno utilizado somente para organização financeira da empresa, sem validade perante o governo",
+            "É um documento obrigatório apenas para empresas de grande porte que possuem muitos funcionários"
+          ],
+          correct: 0,
+          explanation:
+            "Essa guia comprova o pagamento dos tributos devidos pela empresa naquele período. No Simples Nacional, ela é chamada de DAS e reúne vários impostos em um único pagamento."
+        },
+
+        {
+          q: "A empresa pode escolher entre diferentes formas de calcular o imposto sobre o lucro. O que isso significa?",
+          options: [
+            "Todas as empresas pagam exatamente o mesmo valor de imposto, independentemente do regime escolhido",
+            "Existem regras diferentes, e o regime escolhido pode aumentar ou diminuir o quanto a empresa paga de imposto",
+            "Somente empresas que apresentam prejuízo durante o ano podem optar por outro regime tributário",
+            "O regime tributário é definido automaticamente pelo banco onde a empresa possui sua conta empresarial"
+          ],
+          correct: 1,
+          explanation:
+            "Cada regime tributário possui regras próprias para calcular os impostos. Por isso, uma escolha adequada pode reduzir custos e evitar que a empresa pague mais do que deveria."
+        },
+
+        {
+          q: "Para que serve, na prática, o Balanço Patrimonial?",
+          options: [
+            "Mostrar apenas quanto a empresa vendeu durante o último dia útil do mês",
+            "Mostrar uma 'fotografia' da situação financeira da empresa: o que ela tem, o que deve e o que sobra para os sócios",
+            "Servir exclusivamente como documento exigido pelos bancos para aprovação de financiamentos",
+            "Substituir as notas fiscais emitidas durante o funcionamento normal da empresa"
+          ],
+          correct: 1,
+          explanation:
+            "O Balanço Patrimonial funciona como uma fotografia da empresa em uma data específica. Ele mostra seus bens, seus direitos, suas dívidas e o patrimônio que pertence aos sócios."
+        },
+
+        {
+          q: "O que é o Simples Nacional?",
+          options: [
+            "Uma obrigação criada exclusivamente para empresas de grande porte que possuem alto faturamento",
+            "Um aplicativo desenvolvido pelo governo para emissão de boletos e pagamento de tributos",
+            "Uma linha especial de crédito destinada às pequenas empresas em fase de crescimento",
+            "Um regime tributário simplificado, criado para facilitar o pagamento de impostos de pequenas e médias empresas"
+          ],
+          correct: 3,
+          explanation:
+            "O Simples Nacional é um regime tributário que simplifica o recolhimento de impostos para empresas que atendem aos seus requisitos, reunindo vários tributos em uma única guia."
+        },
+
+        {
+          q: "Todo ano, muitas empresas precisam entregar uma declaração informando ao governo o quanto faturaram. Para que serve essa declaração?",
+          options: [
+            "Substitui completamente a necessidade de pagar os impostos mensais da empresa",
+            "É apenas uma formalidade administrativa que não gera nenhuma consequência caso não seja enviada",
+            "Para o governo confirmar se os impostos pagos estão de acordo com o movimento real da empresa",
+            "É uma obrigação exclusiva para empresas que encerraram o ano com prejuízo financeiro"
+          ],
+          correct: 2,
+          explanation:
+            "Essa declaração funciona como uma prestação de contas. Por meio dela, o governo verifica se o faturamento informado e os impostos pagos pela empresa estão corretos."
+        },
+
+        {
+          q: "Qual é a diferença entre faturamento e lucro?",
+          options: [
+            "Representam exatamente o mesmo conceito financeiro, mudando apenas o nome utilizado",
+            "Faturamento é tudo o que a empresa recebeu com vendas; lucro é o que sobra depois de pagar todas as despesas",
+            "Faturamento corresponde somente ao valor que sobra disponível no caixa ao final do mês",
+            "O lucro sempre será maior que o faturamento quando a empresa possui boa administração financeira"
+          ],
+          correct: 1,
+          explanation:
+            "O faturamento representa o total recebido pelas vendas ou serviços. Já o lucro é o valor que sobra depois que todas as despesas e obrigações são pagas."
+        },
+
+        {
+          q: "O que é a folha de pagamento de uma empresa?",
+          options: [
+            "Uma lista contendo apenas os nomes e cargos dos funcionários contratados pela empresa",
+            "O conjunto de cálculos e obrigações relacionados aos salários e encargos dos funcionários",
+            "Um relatório financeiro utilizado exclusivamente para registrar as vendas realizadas pela empresa",
+            "O documento responsável por registrar todas as compras de materiais e equipamentos da empresa"
+          ],
+          correct: 1,
+          explanation:
+            "A folha de pagamento reúne os salários e todos os cálculos relacionados aos funcionários, como férias, décimo terceiro, descontos, benefícios e contribuições."
+        },
+
+        {
+          q: "O que é o pró-labore?",
+          options: [
+            "Um imposto obrigatório cobrado exclusivamente das empresas de grande porte",
+            "A remuneração que o sócio recebe pelo trabalho que exerce na própria empresa",
+            "O valor distribuído entre os sócios apenas no encerramento do exercício financeiro anual",
+            "Uma taxa administrativa cobrada pela prefeitura para permitir o funcionamento da empresa"
+          ],
+          correct: 1,
+          explanation:
+            'O pró-labore é a remuneração recebida pelo sócio pelo trabalho que realiza na empresa. Ele funciona como uma espécie de "salário do sócio", mas não é a mesma coisa que distribuição de lucros.'
+        },
+
+        {
+          q: "O que é a DRE, ou Demonstração do Resultado do Exercício?",
+          options: [
+            "Um relatório que mostra se a empresa teve lucro ou prejuízo em determinado período",
+            "O documento utilizado para comprovar o pagamento de todos os impostos recolhidos pela empresa",
+            "Uma relação completa dos bens, equipamentos e imóveis pertencentes à empresa",
+            "Um documento exigido apenas durante o processo de abertura e registro da empresa"
+          ],
+          correct: 0,
+          explanation:
+            'A DRE mostra as receitas, os custos e as despesas da empresa durante um período, permitindo descobrir se ela teve lucro ou prejuízo. Enquanto o Balanço é uma "foto", a DRE mostra o desempenho ao longo do tempo.'
+        },
+
+        {
+          q: "Por que é importante separar as finanças pessoais das finanças da empresa?",
+          options: [
+            "Não é necessário separar as contas, pois a empresa e o proprietário podem utilizar os mesmos recursos livremente",
+            "Para ter controle real do desempenho do negócio e evitar problemas contábeis e fiscais",
+            "Porque toda empresa é obrigada por lei a encerrar definitivamente a conta pessoal do proprietário",
+            "A separação existe apenas para facilitar a organização visual dos extratos bancários e documentos"
+          ],
+          correct: 1,
+          explanation:
+            "Quando as contas pessoais e empresariais são misturadas, fica difícil saber se o negócio realmente está dando lucro. A separação também facilita o controle contábil e evita problemas fiscais."
+        }
       ],
     },
   },
@@ -175,18 +466,18 @@ const PHASES = [
       {
         type: 'narrator',
         text: 'Após concluir o processo de formalização, a empresa finalmente estava pronta para começar.',
-        duration: 4000,
+        duration: 2000,
       },
       {
         type: 'player',
         text: 'Pronto! Meu CNPJ está aberto. Agora vamos pra cima!',
-        duration: 4000,
+        duration: 2000,
       },
     ],
     infoSpots: [
-      { x: 1300, y: 320, text: 'Agora que sua empresa foi formalizada, é importante manter toda a documentação organizada.' },
-      { x: 820, y: 320, text: 'O acompanhamento contábil ajuda a empresa a crescer com mais segurança.' },
-      { x: 440, y: 340, text: 'O próximo passo é procurar uma contabilidade que acompanhe sua nova jornada.' },
+      { x: 1300, y: 320, text: 'Parabéns por formalizar sua empresa! Esse é só o começo, agora é hora de cuidar bem dela. Boa sorte nessa nova jornada!' },
+      { x: 820, y: 320, text: 'Uma boa gestão financeira, organização e planejamento fazem toda a diferença para o sucesso do seu negócio.' },
+      { x: 440, y: 340, text: 'Lembre-se: buscar orientação de profissionais especializados pode ajudar sua empresa a crescer com mais segurança.' },
     ],
   },
   {
@@ -213,28 +504,28 @@ const PHASES = [
       {
         type: 'narrator',
         text: 'Algum tempo depois...',
-        duration: 3000,
+        duration: 2000,
       },
       {
         type: 'narrator',
         text: 'A empresa começou a crescer. Novos clientes chegaram e as responsabilidades aumentaram.',
-        duration: 5000,
+        duration: 2000,
       },
       {
         type: 'player',
         text: 'Minha empresa está crescendo, mas preciso de ajuda para organizar tudo.',
-        duration: 4500,
+        duration: 2000,
       },
       {
         type: 'player',
         text: 'Ouvi falar muito bem da JS Grilo Contabilidade & Gestão. Vou procurar a equipe deles.',
-        duration: 5500,
+        duration: 2000,
       },
     ],
     infoSpots: [
-      { x: 1400, y: 320, text: 'Com a empresa aberta, novos desafios começam a aparecer.' },
-      { x: 850, y: 320, text: 'Uma contabilidade próxima ajuda o empresário a compreender melhor os números do negócio.' },
-      { x: 420, y: 340, text: 'Você está chegando à JS Grilo Contabilidade & Gestão.' },
+      { x: 1430, y: 325, text: 'Com a empresa crescendo, a papelada e as obrigações também aumentam, é hora de ter um bom apoio contábil.' },
+      { x: 1130, y: 305, text: 'Uma contabilidade de confiança faz toda diferença: ajuda a entender os números e tomar decisões melhores.' },
+      { x: 720, y: 280, text: 'Sou cliente da JS Grilo Contabilidade & Gestão há um tempo, recomendo demais, são muito bons no que fazem!' },
     ],
   },
   {
@@ -254,23 +545,151 @@ const PHASES = [
     // Posição do boss/porta nesta fase (em pixels, dentro da imagem de fundo de 2200x540).
     // Ajuste bossX/bossY livremente pra encaixar o boss na cadeira/mesa da sua arte.
     // bossY é a linha do "chão" onde os pés do boss encostam (mesma lógica do player).
-    bossX: 1700,
-    bossY: 330,
+    bossX: 1740,
+    bossY: 315,
     doorX: 1750, // porta de saída (some até vencer o boss)
     groundY: 460,        // altura em que os PÉS do personagem encostam nesta fase (chão da perspectiva)
     showExitArrow: false, // fase final: sem seta, o jogo encerra na hora
     characterScale: 2.7, // tamanho do personagem só nesta fase (perspectivas diferentes = tamanhos diferentes)
     infoSpots: [
-      { x: 210, y: 230, text: 'Olá, Seja bem vindo a JS Grilo Contabilidade.' },
-      { x: 720, y: 230, text: 'Existem vários tipos de empresa (MEI, ME, LTDA...). O ideal depende do seu faturamento e atividade.' },
-      { x: 1355, y: 210, text: 'Um contador não é só pra fazer imposto: ele te ajuda a tomar decisões melhores desde o início.' },
+      { x: 210, y: 230, text: 'Olá, Seja bem vindo a JS Grilo Contabilidade. Parabéns por chegar até aqui! Agora você vai conhecer assuntos mais avançados da contabilidade. Boa sorte!' },
+      { x: 720, y: 230, text: 'A legislação muda com frequência. Manter-se atualizado é essencial para qualquer empresa.' },
+      { x: 1355, y: 210, text: 'A contabilidade não serve apenas para cumprir obrigações. Ela também ajuda a empresa a crescer com mais segurança.' },
     ],
     boss: {
-      name: 'Empresário Desorganizado',
+      name: 'Dona da JS',
+      portrait: { idle: 'boss3_idle.png', talk: 'boss3_talk.png' },
+      portraitHeight: 100,
+      greeting: 'Seja bem-vindo à JS Grilo! Eu sou a responsável pelo escritório. Vamos ver o que você sabe sobre os temas mais avançados da contabilidade?',
+      introLines: ['Vamos à primeira:', 'Ótimo! Vamos pra próxima:', 'Última pergunta, força:'],
+      correctLines: ['Isso mesmo, muito bem!', 'Perfeito!', 'Excelente resposta!'],
+      wrongLines: ['Quase lá.', 'Essa é mais avançada, deixa eu explicar:', 'Vamos entender juntos:'],
+      resultMessages: {
+        3: 'Impressionante! Você domina até os temas mais avançados da contabilidade. Poucos empresários chegam nesse nível, parabéns!',
+        2: 'Muito bom! Você já entende bastante, só alguns detalhes pra aperfeiçoar. E pra isso, contar com uma contabilidade especializada como a JS Grilo faz toda diferença.',
+        1: 'Esses temas mais avançados realmente pegam muita gente, e é exatamente pra isso que existe a JS Grilo. Você não precisa saber tudo sozinho, é só contar com a gente!',
+        0: 'Não se preocupe, esses são assuntos bem complexos mesmo, até pra quem já tem empresa há um tempo. É justamente por isso que ter uma contabilidade de confiança como a JS Grilo ao seu lado faz toda a diferença.',
+      },
       questions: [
-        { q: 'O que é CNPJ?', options: ['Um tipo de imposto', 'O documento de identificação da empresa', 'Um empréstimo bancário', 'Um tipo de contrato de trabalho'], correct: 1, explanation: 'CNPJ é o Cadastro Nacional da Pessoa Jurídica: identifica a empresa perante o governo, bancos e clientes.' },
-        { q: 'Qual a principal vantagem de ter um contador desde o começo?', options: ['Ele garante que a empresa nunca pague imposto', 'Ele ajuda a organizar e planejar decisões financeiras', 'Ele é obrigatório só depois de 1 ano de empresa', 'Ele substitui o dono na gestão'], correct: 1, explanation: 'O contador ajuda a organizar as finanças e orientar decisões — quanto antes ele entra, menos erros custosos acontecem.' },
-        { q: 'O tipo de empresa ideal para abrir depende de quê?', options: ['Da cor do logotipo', 'Só da vontade do dono', 'Do faturamento e da atividade do negócio', 'Do número de sócios apenas'], correct: 2, explanation: 'Faturamento esperado e tipo de atividade definem o enquadramento (MEI, ME, LTDA etc.) mais vantajoso.' },
+        {
+          q: "O Brasil está passando por uma reforma tributária que simplifica os impostos sobre consumo. Na prática, o que ela faz?",
+          options: [
+            "Cria um modelo único de Imposto de Renda para pessoas físicas e jurídicas, substituindo as faixas e regras atuais",
+            "Junta vários impostos que hoje existem separadamente, como PIS, Cofins, ICMS e ISS, em novos tributos chamados CBS e IBS",
+            "Elimina todos os tributos federais incidentes sobre produtos e serviços comercializados no território nacional",
+            "Altera apenas a forma de tributação dos Microempreendedores Individuais, sem afetar as demais empresas"
+          ],
+          correct: 1,
+          explanation: "A Reforma Tributária busca simplificar o sistema brasileiro, substituindo diversos tributos sobre o consumo por dois novos: a CBS e o IBS. Isso torna as regras mais claras e reduz a complexidade para empresas e contribuintes."
+        },
+
+        {
+          q: "A reforma tributária também criou o chamado Imposto Seletivo. O que ele faz?",
+          options: [
+            "Substitui o Imposto de Renda cobrado das pessoas físicas que ultrapassam determinado limite de rendimento anual",
+            "Cobra um valor extra sobre produtos prejudiciais à saúde ou ao meio ambiente, como cigarros e bebidas alcoólicas",
+            "É cobrado exclusivamente de empreendedores que abrem uma nova empresa ou alteram sua atividade econômica",
+            "Concede um desconto tributário aos consumidores que compram produtos recicláveis ou ambientalmente sustentáveis"
+          ],
+          correct: 1,
+          explanation: "O Imposto Seletivo incide sobre produtos considerados prejudiciais à saúde ou ao meio ambiente. Por isso, ele ficou conhecido como o 'imposto do pecado'."
+        },
+
+        {
+          q: "Quando duas empresas do mesmo grupo fazem negócio entre si e o produto ainda não foi revendido para fora do grupo, o que acontece com esse lucro na consolidação?",
+          options: [
+            "O lucro é reconhecido integralmente, pois a operação ocorreu entre duas empresas juridicamente independentes",
+            "O lucro é retirado das demonstrações, porque ainda não representa um ganho real para o grupo perante terceiros",
+            "O lucro é registrado em dobro, uma vez que aparece simultaneamente na empresa compradora e na vendedora",
+            "O lucro é convertido em uma obrigação financeira da empresa que adquiriu o produto dentro do grupo"
+          ],
+          correct: 1,
+          explanation: "Na consolidação das demonstrações financeiras, esse lucro é eliminado, pois a operação aconteceu apenas dentro do próprio grupo empresarial e ainda não gerou um ganho efetivo perante terceiros."
+        },
+
+        {
+          q: "O que é o período de transição da Reforma Tributária?",
+          options: [
+            "O prazo em que os tributos antigos e os novos coexistirão gradualmente até ocorrer a substituição completa",
+            "O período temporário em que as empresas ficam dispensadas do pagamento de tributos sobre o consumo",
+            "O prazo concedido ao proprietário para decidir se deseja manter ou encerrar definitivamente a empresa",
+            "Um benefício fiscal temporário destinado exclusivamente aos Microempreendedores Individuais formalizados"
+          ],
+          correct: 0,
+          explanation: "A mudança não acontece de uma única vez. Durante alguns anos, os tributos atuais e os novos coexistirão para permitir uma adaptação gradual de empresas, governos e contribuintes."
+        },
+
+        {
+          q: "O que significa dizer que a CBS e o IBS serão tributos não cumulativos?",
+          options: [
+            "Significa que esses tributos não poderão aparecer mais de uma vez no mesmo documento fiscal emitido pela empresa",
+            "A empresa pode descontar do imposto devido os valores pagos nas etapas anteriores da cadeia produtiva",
+            "Os tributos serão cobrados apenas uma vez durante todo o período de funcionamento da empresa",
+            "As empresas não poderão utilizar créditos tributários relacionados às compras e despesas realizadas"
+          ],
+          correct: 1,
+          explanation: "A não cumulatividade evita o chamado 'imposto sobre imposto'. Assim, a empresa aproveita créditos referentes às etapas anteriores da produção."
+        },
+
+        {
+          q: "O que costuma ser feito, do ponto de vista contábil, no encerramento do exercício de uma empresa?",
+          options: [
+            "A empresa encerra formalmente suas atividades e realiza uma nova abertura para iniciar o exercício seguinte",
+            "São apurados os resultados do período e organizadas as contas para elaborar as demonstrações contábeis",
+            "Os tributos ainda não pagos durante o ano são automaticamente cancelados pelos órgãos responsáveis",
+            "Os contratos de trabalho são encerrados para que os funcionários sejam novamente registrados no ano seguinte"
+          ],
+          correct: 1,
+          explanation: "No encerramento do exercício, a contabilidade apura os resultados da empresa e prepara as demonstrações contábeis que representam tudo o que aconteceu durante o ano."
+        },
+
+        {
+          q: "O que é a consolidação das demonstrações financeiras de um grupo de empresas?",
+          options: [
+            "É a soma direta de todos os balanços das empresas, sem excluir transações ou realizar qualquer tipo de ajuste",
+            "É a união das demonstrações das empresas do grupo em um único conjunto, eliminando operações entre elas",
+            "É um relatório institucional elaborado exclusivamente para divulgar os resultados do grupo ao mercado",
+            "É uma declaração tributária utilizada para reunir e calcular todos os impostos federais das empresas"
+          ],
+          correct: 1,
+          explanation: "A consolidação reúne as informações das empresas do grupo como se todas formassem uma única organização, eliminando transações realizadas entre elas."
+        },
+
+        {
+          q: "O que é a Escrituração Contábil Digital (ECD), também chamada de SPED Contábil?",
+          options: [
+            "Uma plataforma de comércio eletrônico utilizada pelas empresas para registrar vendas e emitir pedidos online",
+            "O envio digital da contabilidade da empresa ao governo, substituindo os antigos livros contábeis em papel",
+            "Uma modalidade de empréstimo disponibilizada por bancos para financiar a modernização das empresas",
+            "Uma declaração eletrônica destinada exclusivamente às pessoas físicas que possuem rendimentos empresariais"
+          ],
+          correct: 1,
+          explanation: "A ECD faz parte do SPED e permite que os livros contábeis sejam enviados digitalmente ao governo, substituindo os antigos registros em papel."
+        },
+
+        {
+          q: "Com a Reforma Tributária, uma das mudanças é que o imposto passará a ser mostrado 'por fora' na nota fiscal. O que isso significa para o consumidor?",
+          options: [
+            "O preço final dos produtos e serviços será reduzido automaticamente após a implantação do novo sistema",
+            "Ficará mais claro quanto do valor pago pelo consumidor corresponde aos impostos cobrados na operação",
+            "O consumidor deixará de pagar tributos sobre os produtos e serviços adquiridos no mercado",
+            "Os produtos não terão mais impostos considerados na composição do preço apresentado ao consumidor"
+          ],
+          correct: 1,
+          explanation: "A proposta é tornar o sistema mais transparente, permitindo que o consumidor visualize claramente quanto do preço corresponde aos tributos."
+        },
+
+        {
+          q: "Ao comprar outra empresa por um valor acima do que vale seu patrimônio líquido, como costuma ser chamada essa diferença?",
+          options: [
+            "Depreciação acumulada, correspondente à perda de valor dos bens e ativos adquiridos na operação",
+            "Ágio, ou goodwill, normalmente relacionado às expectativas de lucros e benefícios econômicos futuros",
+            "Provisão para devedores duvidosos, destinada a cobrir possíveis perdas com clientes inadimplentes",
+            "Capital de giro, utilizado para financiar as despesas operacionais e manter as atividades da empresa"
+          ],
+          correct: 1,
+          explanation: "Esse valor adicional é conhecido como ágio, ou goodwill. Ele representa benefícios esperados, como marca, reputação, carteira de clientes e potencial de geração de lucros futuros."
+        }
       ],
     },
   },
@@ -287,6 +706,29 @@ function pickRandom(arr, n) {
     result.push(copy.splice(idx, 1)[0]);
   }
   return result;
+}
+
+function shuffleQuestion(question) {
+  const items = question.options.map((text, index) => ({
+    text,
+    isCorrect: index === question.correct,
+  }));
+
+  // Embaralhamento Fisher-Yates
+  for (let i = items.length - 1; i > 0; i--) {
+    const randomIndex = Math.floor(Math.random() * (i + 1));
+
+    [items[i], items[randomIndex]] = [
+      items[randomIndex],
+      items[i],
+    ];
+  }
+
+  return {
+    ...question,
+    options: items.map((item) => item.text),
+    correct: items.findIndex((item) => item.isCorrect),
+  };
 }
 
 function updateHUD() {
@@ -503,21 +945,23 @@ function endGame(won) {
 // BATALHA DE BOSS — PAUSA o jogo (física + input) enquanto ativa
 // ---------------------------------------------------------
 function positionBossDialogue(scene, bossSprite) {
-  // #game-wrapper é sempre 960x540 "por dentro" — o zoom de tela cheia (fitGameToScreen)
-  // é feito com um CSS transform em cima do wrapper inteiro, então tudo que está dentro
-  // dele (HUD, balões etc.) escala JUNTO automaticamente. Por isso aqui a gente só usa
-  // as coordenadas nativas (960x540), sem multiplicar por nenhum fator de zoom.
   const bounds = bossSprite.getBounds();
   const scrollX = scene.cameras.main.scrollX;
   let screenX = bounds.centerX - scrollX;
   const screenTopY = bounds.top;
 
-  // Evita o balão sair da tela quando o boss está perto da borda direita/esquerda
-  screenX = Math.min(Math.max(screenX, 160), 960 - 160);
+  screenX = Math.min(Math.max(screenX, 170), 960 - 170);
 
   const dialogueEl = document.getElementById('boss-dialogue');
   dialogueEl.style.left = `${screenX}px`;
-  dialogueEl.style.bottom = `${540 - screenTopY + 26}px`;
+
+  let bottom = 540 - screenTopY + 26;
+  const boxHeight = dialogueEl.offsetHeight;
+  const maxBottom = 540 - 10 - boxHeight; // deixa no mínimo 10px de folga no topo da tela
+  if (boxHeight > 0 && bottom > maxBottom) {
+    bottom = Math.max(maxBottom, 10);
+  }
+  dialogueEl.style.bottom = `${bottom}px`;
 }
 
 // Frases de transição do "boss falando" — variam um pouco por pergunta pra não ficar repetitivo.
@@ -560,10 +1004,12 @@ function startBossBattle(scene, phaseConfig, bossSprite, onComplete) {
   const optionsEl = document.getElementById('question-options');
 
   overlay.classList.remove('hidden');
-  nameEl.textContent = `⚔️ ${phaseConfig.boss.name}`;
+  nameEl.textContent = ` ${phaseConfig.boss.name}`;
 
-  const questions = pickRandom(phaseConfig.boss.questions, 3);
+  const questions = pickRandom(phaseConfig.boss.questions, 3)
+    .map((question) => shuffleQuestion(question));
   let qIndex = 0;
+  let battleCorrectCount = 0;
   let timerInterval = null;
   let typeInterval = null;
   const typeState = { instant: false };
@@ -574,21 +1020,26 @@ function startBossBattle(scene, phaseConfig, bossSprite, onComplete) {
   function typeText(text, onDone) {
     clearInterval(typeInterval);
     questionEl.textContent = '';
-    headerEl.textContent = '💬';
+    headerEl.textContent = '';
     typeState.instant = false;
+    scene.startBossTalkAnim?.();
     let i = 0;
     typeInterval = setInterval(() => {
-      if (isStale()) { clearInterval(typeInterval); return; }
+      if (isStale()) { clearInterval(typeInterval); scene.stopBossTalkAnim?.(); return; }
       if (typeState.instant) {
         questionEl.textContent = text;
+        positionBossDialogue(scene, bossSprite);   // <-- adiciona
         clearInterval(typeInterval);
+        scene.stopBossTalkAnim?.();
         if (onDone) onDone();
         return;
       }
       i += 1;
       questionEl.textContent = text.slice(0, i);
+      positionBossDialogue(scene, bossSprite);      // <-- adiciona
       if (i >= text.length) {
         clearInterval(typeInterval);
+        scene.stopBossTalkAnim?.();
         if (onDone) onDone();
       }
     }, TYPE_SPEED_MS);
@@ -600,7 +1051,8 @@ function startBossBattle(scene, phaseConfig, bossSprite, onComplete) {
     if (isStale()) return;
     answersPanelEl.classList.add('hidden');
     const q = questions[index];
-    typeText(pickLine(BOSS_INTRO_LINES, index), () => {
+    const introLines = phaseConfig.boss.introLines || BOSS_INTRO_LINES;
+    typeText(pickLine(introLines, index), () => {
       if (isStale()) return;
       setTimeout(() => {
         if (isStale()) return;
@@ -649,18 +1101,22 @@ function startBossBattle(scene, phaseConfig, bossSprite, onComplete) {
 
     if (isCorrect) {
       GameData.correctAnswers += 1;
+      battleCorrectCount += 1;
     } else {
       GameData.lives -= 1;
     }
     updateHUD();
 
+    const correctLines = phaseConfig.boss.correctLines || BOSS_CORRECT_LINES;
+    const wrongLines = phaseConfig.boss.wrongLines || BOSS_WRONG_LINES;
+
     const resultText = isCorrect
-      ? pickLine(BOSS_CORRECT_LINES, qIndex)
-      : `${pickLine(BOSS_WRONG_LINES, qIndex)} ${q.explanation}`;
+      ? pickLine(correctLines, qIndex)
+      : `${pickLine(wrongLines, qIndex)} ${q.explanation}`;
 
     typeText(resultText, () => {
       if (isStale()) return;
-      const waitTime = isCorrect ? 1400 : 4200; // dá mais tempo de leitura quando erra (tem explicação)
+      const waitTime = isCorrect ? 1400 : 4200;
       setTimeout(() => {
         if (isStale()) return;
         qIndex += 1;
@@ -673,12 +1129,29 @@ function startBossBattle(scene, phaseConfig, bossSprite, onComplete) {
         if (qIndex < questions.length) {
           playIntroThenQuestion(qIndex);
         } else {
-          overlay.classList.add('hidden');
-          finishBossUI();
-          onComplete();
+          finishBattleWithResult();
         }
       }, waitTime);
     });
+  }
+
+  // Mostra a mensagem final (varia conforme o desempenho: 3/3, 2/3, 1/3 ou 0/3) antes de liberar a saída
+  function finishBattleWithResult() {
+    const msg = phaseConfig.boss.resultMessages?.[battleCorrectCount];
+    if (msg) {
+      typeText(msg, () => {
+        setTimeout(() => {
+          if (isStale()) return;
+          overlay.classList.add('hidden');
+          finishBossUI();
+          onComplete();
+        }, 2800);
+      });
+    } else {
+      overlay.classList.add('hidden');
+      finishBossUI();
+      onComplete();
+    }
   }
 
   function finishBossUI() {
@@ -690,7 +1163,13 @@ function startBossBattle(scene, phaseConfig, bossSprite, onComplete) {
     scene.inputManager.setEnabled(true);
   }
 
-  playIntroThenQuestion(qIndex);
+  if (phaseConfig.boss.greeting) {
+    typeText(phaseConfig.boss.greeting, () => {
+      setTimeout(() => playIntroThenQuestion(qIndex), 900);
+    });
+  } else {
+    playIntroThenQuestion(qIndex);
+  }
 }
 
 // ---------------------------------------------------------
@@ -798,7 +1277,7 @@ function updateInfoBubble(scene, playerX, infoSpots, phaseId, infoIcons) {
 
       bubble.classList.remove("info-bubble-hidden");
       animateInfoBubbleOpening(bubble);
-      typeInfoText(content, `💬 ${nearest.text}`);
+      typeInfoText(content, ` ${nearest.text}`);
     }
     return;
   }
@@ -911,7 +1390,7 @@ function startNarrative(scene, narrative, onComplete) {
 
   function getSpeaker(dialogue) {
     if (dialogue.type === 'player') {
-      return `💬 ${GameData.playerName}`;
+      return ` ${GameData.playerName}`;
     }
 
     return '📖 Narrador';
@@ -1160,6 +1639,16 @@ class PhaseScene extends Phaser.Scene {
       this.load.image(bgKey, `assets/backgrounds/${cfg.bg}`);
     }
 
+    const hasBoss = cfg.hasBoss !== false && cfg.boss;
+    if (hasBoss && cfg.boss.portrait) {
+      const idleKey = `boss_${cfg.id}_idle`;
+      const talkKey = `boss_${cfg.id}_talk`;
+      if (!this.textures.exists(idleKey)) {
+        this.load.image(idleKey, `assets/bosses/${cfg.boss.portrait.idle}`);
+        this.load.image(talkKey, `assets/bosses/${cfg.boss.portrait.talk}`);
+      }
+    }
+
     const charId = GameData.selectedCharacter;
     if (!this.textures.exists(`char_${charId}_idle`)) {
       this.load.spritesheet(`char_${charId}_idle`, `assets/characters/${charId}/Idle.png`, {
@@ -1276,7 +1765,7 @@ class PhaseScene extends Phaser.Scene {
         .setAlpha(0.75);
 
       this.tweens.add({
-        targets: icon,
+        targets: icon,          // <- corrigido
         y: icon.y - 4,
         duration: 650,
         yoyo: true,
@@ -1298,9 +1787,68 @@ class PhaseScene extends Phaser.Scene {
       const bossX = cfg.bossX;
       const bossY = cfg.bossY;
 
-      this.bossSprite = this.add
-        .image(bossX, bossY, 'bossTex')
-        .setOrigin(0.5, 1);
+      if (cfg.boss.portrait) {
+        const idleKey = `boss_${cfg.id}_idle`;
+        const talkKey = `boss_${cfg.id}_talk`;
+        const portraitHeight = cfg.boss.portraitHeight ?? 260;
+        const flip = cfg.boss.portraitFlip === true;
+
+        const idleTex = this.textures.get(idleKey).getSourceImage();
+        const talkTex = this.textures.get(talkKey).getSourceImage();
+        const idleBaseScale = portraitHeight / idleTex.height;
+        const talkBaseScale = portraitHeight / talkTex.height;
+
+        this.bossIdleSprite = this.add.image(bossX, bossY, idleKey)
+          .setOrigin(0.5, 1)
+          .setScale(idleBaseScale)
+          .setFlipX(flip);
+
+        this.bossTalkSprite = this.add.image(bossX, bossY, talkKey)
+          .setOrigin(0.5, 1)
+          .setScale(talkBaseScale)
+          .setFlipX(flip)
+          .setVisible(false);
+
+        this.bossSprite = this.bossIdleSprite; // usado pra posicionar o balão de diálogo
+
+        // Respiração sutil — escala em cima da própria base (pés ficam travados no lugar)
+        this.tweens.add({
+          targets: this.bossIdleSprite,
+          scaleY: idleBaseScale * 1.02,
+          scaleX: idleBaseScale * 0.995,
+          duration: 700,
+          yoyo: true,
+          repeat: -1,
+          ease: 'Sine.easeInOut',
+        });
+        this.tweens.add({
+          targets: this.bossTalkSprite,
+          scaleY: talkBaseScale * 1.02,
+          scaleX: talkBaseScale * 0.995,
+          duration: 700,
+          yoyo: true,
+          repeat: -1,
+          ease: 'Sine.easeInOut',
+        });
+
+        this.bossTalkInterval = null;
+        this.startBossTalkAnim = () => {
+          if (this.bossTalkInterval) return;
+          this.bossTalkInterval = setInterval(() => {
+            const showTalk = !this.bossTalkSprite.visible;
+            this.bossTalkSprite.setVisible(showTalk);
+            this.bossIdleSprite.setVisible(!showTalk);
+          }, 160);
+        };
+        this.stopBossTalkAnim = () => {
+          clearInterval(this.bossTalkInterval);
+          this.bossTalkInterval = null;
+          this.bossIdleSprite.setVisible(true);
+          this.bossTalkSprite.setVisible(false);
+        };
+      } else {
+        this.bossSprite = this.add.image(bossX, bossY, 'bossTex').setOrigin(0.5, 1);
+      }
 
       this.bossZone = this.add.zone(
         bossX,
@@ -1398,24 +1946,24 @@ class PhaseScene extends Phaser.Scene {
     this.phaseTransitioning = false; // trava pra não disparar a troca de fase várias vezes seguidas
 
     // Sistema de input
-this.inputManager = new InputManager(this);
+    this.inputManager = new InputManager(this);
 
-this.levelWidth = cfg.levelWidth;
+    this.levelWidth = cfg.levelWidth;
 
-updateHUD();
-updateMuraisCounter(cfg.id, cfg.infoSpots.length);
+    updateHUD();
+    updateMuraisCounter(cfg.id, cfg.infoSpots.length);
 
-// Bloqueia o personagem durante o título
-this.inputManager.setEnabled(false);
+    // Bloqueia o personagem durante o título
+    this.inputManager.setEnabled(false);
 
-// Apresentação do capítulo
-showPhaseIntro(cfg, () => {
-  if (cfg.narrative?.length) {
-    startNarrative(this, cfg.narrative);
-  } else {
-    this.inputManager.setEnabled(true);
-  }
-});
+    // Apresentação do capítulo
+    showPhaseIntro(cfg, () => {
+      if (cfg.narrative?.length) {
+        startNarrative(this, cfg.narrative);
+      } else {
+        this.inputManager.setEnabled(true);
+      }
+    });
 
   }
 
