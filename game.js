@@ -551,7 +551,7 @@ const PHASES = [
       { x: 720, y: 280, text: 'Sou cliente da JS Grilo Contabilidade & Gestão há um tempo, recomendo demais, são muito bons no que fazem!' },
     ],
   },
-  {
+  { 
     id: 'fase3',
     name: 'JS Grilo Contabilidade & Gestão',
     startX: 80,
