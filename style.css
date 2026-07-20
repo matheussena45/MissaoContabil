@@ -24,8 +24,7 @@
   box-sizing: border-box;
 }
 
-html,
-body {
+html, body {
   margin: 0;
   padding: 0;
   width: 100%;
@@ -40,7 +39,7 @@ body {
 }
 
 #game-wrapper {
-  position: absolute;
+  position: fixed;   /* era "absolute" */
   top: 50%;
   left: 50%;
   width: 960px;
@@ -834,4 +833,8 @@ button:hover {
 
 .touch-btn:active {
   background: rgba(242, 169, 0, 0.35);
+}
+
+.link a {
+  color: white;
 }

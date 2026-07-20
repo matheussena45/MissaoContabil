@@ -11,7 +11,7 @@
 const RANKING_KEY = 'empresario_ranking_v1';
 const MAX_LIVES = 6;
 const INFO_PROXIMITY_RADIUS = 90; // px — raio em que o mural fica visível
-const ANSWER_SECONDS = 30;  // tempo pra responder depois que as alternativas aparecem
+const ANSWER_SECONDS = 15;  // tempo pra responder depois que as alternativas aparecem
 const ONCE_BUBBLE_MIN_MS = 4500; // tempo mínimo que um mural "de uso único" fica aberto, mesmo andando
 const NARRATIVE_TYPE_SPEED_MS = 45;
 const NARRATIVE_DEFAULT_DURATION_MS = 4000;
@@ -132,7 +132,7 @@ const PHASES = [
       portrait: { idle: 'boss1_idle.png', talk: 'boss1_talk.png' },
       portraitHeight: 130, // corpo inteiro — maior que os outros dois (retrato busto)
       portraitFlip: true,
-      greeting: 'Olá!Me chamo Franciel Monte, sou o Analista do Sebrae. Antes de você seguir sua jornada, vou ver o que você já aprendeu sobre abrir uma empresa!',
+      greeting: 'Olá! Me chamo Franciel Monte, sou o Analista do Sebrae. Antes de você seguir sua jornada, vou ver o que você já aprendeu sobre abrir uma empresa!',
       introLines: [
         'Vamos lá, primeira pergunta:',
         'Show de bola! Próxima:',
@@ -158,121 +158,121 @@ const PHASES = [
         {
           q: "Para que serve o CNPJ?",
           options: [
-            'É o "documento de identidade" da empresa, usado para ela existir oficialmente perante o governo',
-            'É o número utilizado pelo banco para identificar a principal conta financeira da empresa e registrar suas movimentações',
-            'É um selo de qualidade concedido pelos órgãos públicos às empresas que cumprem todos os requisitos legais',
-            'É um documento que substitui o CPF do proprietário em qualquer operação realizada pela empresa'
+            "Identifica oficialmente a empresa perante o governo",
+            "Identifica a principal conta bancária da empresa",
+            "Comprova a qualidade dos serviços da empresa",
+            "Substitui o CPF do proprietário da empresa"
           ],
           correct: 0,
-          explanation: "O CNPJ é como o documento de identidade da empresa. É por meio dele que ela existe oficialmente perante o governo e pode exercer suas atividades de forma legal."
+          explanation: "O CNPJ funciona como a identidade da empresa. É por meio dele que ela existe oficialmente e pode exercer suas atividades de forma legal."
         },
 
         {
-          q: "O que é o MEI (Microempreendedor Individual)?",
+          q: "O que é o MEI?",
           options: [
-            'Uma linha de crédito criada por bancos públicos para incentivar pequenos empreendedores no início do negócio',
-            'Um jeito simples e barato de formalizar um pequeno negócio, como autônomo',
-            'Um tipo de imposto pago mensalmente por empresas que possuem apenas um funcionário registrado',
-            'Um curso obrigatório oferecido pelo governo antes da abertura de qualquer empresa no Brasil'
+            "Uma linha de crédito para empreendedores",
+            "Uma forma simples de formalizar pequenos negócios",
+            "Um imposto destinado às grandes empresas",
+            "Um curso obrigatório para abrir empresas"
           ],
           correct: 1,
-          explanation: "O MEI foi criado para facilitar a formalização de pequenos empreendedores, permitindo que trabalhem legalmente, tenham CNPJ e possam emitir nota fiscal."
+          explanation: "O MEI facilita a formalização de pequenos empreendedores, permitindo atuar legalmente com menos burocracia e menor custo."
         },
 
         {
-          q: "Depois de formalizar a empresa, o que ela passa a ter direito/dever de fazer?",
+          q: "Empresa formalizada deve:",
           options: [
-            'Ficar permanentemente isenta do pagamento de impostos e demais obrigações fiscais previstas em lei',
-            'Emitir nota fiscal e pagar os impostos e taxas devidos',
-            'Deixar de prestar informações ao governo porque a empresa já está oficialmente registrada',
-            'Contratar funcionários imediatamente, independentemente do porte ou da necessidade do negócio'
+            "Ficar isenta de todos os impostos",
+            "Emitir notas fiscais e pagar impostos",
+            "Deixar de prestar informações ao governo",
+            "Contratar funcionários imediatamente"
           ],
           correct: 1,
-          explanation: "Ao formalizar uma empresa, ela ganha direitos, como emitir nota fiscal, mas também assume responsabilidades, como cumprir suas obrigações fiscais."
+          explanation: "Ao formalizar a empresa, ela passa a ter direitos, como emitir nota fiscal, mas também assume obrigações fiscais."
         },
 
         {
-          q: "O que significa a razão social de uma empresa?",
+          q: "Razão social é:",
           options: [
-            'O nome utilizado pela empresa em campanhas publicitárias, redes sociais e materiais de divulgação',
-            'O nome oficial e completo da empresa, registrado nos documentos legais',
-            'O endereço comercial informado no cadastro da prefeitura durante a abertura da empresa',
-            'O valor do patrimônio inicial declarado pelos sócios no momento da constituição da empresa'
+            "O nome usado nas redes sociais",
+            "O nome oficial registrado da empresa",
+            "O endereço principal da empresa",
+            "O valor investido pelos sócios"
           ],
           correct: 1,
-          explanation: "A razão social é o nome oficial registrado nos documentos da empresa. Já o nome fantasia é aquele que os clientes costumam conhecer."
+          explanation: "A razão social é o nome registrado nos documentos oficiais. Ela pode ser diferente do nome fantasia usado pelos clientes."
         },
 
         {
-          q: "O que geralmente é necessário para abrir uma conta bancária no nome da empresa (conta PJ)?",
+          q: "Para abrir conta PJ é preciso:",
           options: [
-            'Somente o CPF do proprietário e um comprovante atualizado de residência em seu nome',
-            'O CNPJ da empresa e os documentos de constituição dela',
-            'Um comprovante demonstrando que a empresa já obteve lucro suficiente para movimentar uma conta empresarial',
-            'Uma autorização emitida pelo contador responsável confirmando que a empresa está apta para abrir conta'
+            "CPF e comprovante de residência",
+            "CNPJ e documentos da empresa",
+            "Comprovante de faturamento anual",
+            "Autorização emitida pelo contador"
           ],
           correct: 1,
-          explanation: "Antes de abrir uma conta empresarial, o banco precisa confirmar que a empresa existe oficialmente, por isso solicita o CNPJ e os documentos da empresa."
+          explanation: "Os bancos precisam confirmar que a empresa existe legalmente, por isso exigem o CNPJ e seus documentos."
         },
 
         {
-          q: "Por que a maioria das empresas contrata um contador?",
+          q: "Por que contratar contador?",
           options: [
-            'Porque toda empresa, independentemente do porte, é obrigada por lei a possuir um contador exclusivo em tempo integral',
-            'Para cuidar de obrigações fiscais, contábeis e trabalhistas que a lei exige',
-            'Porque somente um contador possui autorização legal para emitir notas fiscais em nome da empresa',
-            'Para assumir as decisões administrativas e financeiras que normalmente seriam tomadas pelos sócios'
+            "Atender somente empresas de grande porte",
+            "Cuidar das obrigações fiscais e contábeis",
+            "Realizar as vendas da empresa",
+            "Assumir a administração do negócio"
           ],
           correct: 1,
-          explanation: "O contador auxilia a empresa a cumprir suas obrigações legais, organizar as finanças e evitar problemas com o Fisco."
+          explanation: "O contador ajuda a empresa a cumprir suas obrigações legais, organizar as finanças e evitar problemas com o Fisco."
         },
 
         {
-          q: "De forma simples, o que é o regime tributário de uma empresa?",
+          q: "Regime tributário é:",
           options: [
-            'O conjunto de horários e regras que determina quando uma empresa pode funcionar legalmente',
-            'O conjunto de regras que define como e quanto a empresa vai pagar de impostos',
-            'A classificação utilizada pelo governo para definir quais produtos uma empresa está autorizada a vender',
-            'O limite máximo de sócios permitido para cada empresa de acordo com sua atividade econômica'
+            "O horário de funcionamento da empresa",
+            "As regras para calcular os impostos",
+            "O tipo de produto comercializado",
+            "A quantidade máxima de sócios"
           ],
           correct: 1,
-          explanation: "O regime tributário funciona como um conjunto de regras que define a forma de cálculo e o pagamento dos impostos da empresa."
+          explanation: "O regime tributário define como os impostos serão calculados e pagos pela empresa, de acordo com a legislação."
         },
 
         {
-          q: "Por que é importante guardar notas fiscais e comprovantes de gastos da empresa?",
+          q: "Por que guardar notas fiscais?",
           options: [
-            'Depois da compra esses documentos podem ser descartados, pois ficam registrados automaticamente no governo',
-            'Servem para comprovar despesas, ajudar no controle financeiro e evitar problemas com o Fisco',
-            'São utilizados apenas para organizar os arquivos físicos da empresa e facilitar consultas internas',
-            'Têm utilidade apenas quando é necessário solicitar a troca de um produto adquirido pela empresa'
+            "Porque elas não podem ser descartadas",
+            "Para comprovar despesas e organizar a empresa",
+            "Para decorar o arquivo da empresa",
+            "Para trocar produtos comprados"
           ],
           correct: 1,
-          explanation: "Esses documentos registram tudo o que entra e sai da empresa, facilitando o controle financeiro e comprovando despesas quando necessário."
+          explanation: "As notas fiscais ajudam no controle financeiro, comprovam despesas e podem ser exigidas em fiscalizações."
         },
 
         {
-          q: "O que pode acontecer se a empresa não pagar os impostos em dia?",
+          q: "Imposto não pago em dia gera:",
           options: [
-            'Os impostos podem ser pagos a qualquer momento sem cobrança adicional, desde que sejam quitados no mesmo ano',
-            'A empresa pode ser multada, ter juros sobre o valor devido e até ficar com restrições (como negativação)',
-            'O governo costuma cancelar automaticamente os débitos após determinado período sem necessidade de pagamento',
-            'O contador responsável assume legalmente a dívida e realiza o pagamento em nome da empresa'
+            "Nenhuma consequência para a empresa",
+            "Multas, juros e possíveis restrições",
+            "Perdão automático após alguns dias",
+            "Pagamento feito pelo contador"
           ],
           correct: 1,
-          explanation: "Assim como qualquer conta em atraso, impostos não pagos podem gerar multas, juros e outras restrições para a empresa."
+          explanation: "O atraso no pagamento pode gerar multas, juros e outras restrições que prejudicam a empresa."
         },
 
         {
-          q: "O que é o alvará de funcionamento?",
+          q: "Alvará de funcionamento é:",
           options: [
-            'Um documento que autoriza a empresa a funcionar naquele endereço, emitido pela prefeitura',
-            'O comprovante oficial de pagamento das contribuições mensais realizadas pelo Microempreendedor Individual',
-            'Um seguro obrigatório contratado para proteger a empresa contra multas e fiscalizações municipais',
-            'O contrato firmado entre os sócios definindo as responsabilidades administrativas de cada participante'
+            "Autorização para funcionar no endereço",
+            "Comprovante de inscrição no MEI",
+            "Seguro obrigatório da empresa",
+            "Contrato firmado entre os sócios"
           ],
           correct: 0,
-          explanation: "O alvará é a autorização concedida pela prefeitura para que a empresa possa exercer suas atividades legalmente naquele endereço."
+          explanation: "O alvará é a autorização concedida pela prefeitura para que a empresa possa funcionar legalmente naquele local."
         }
       ],
     },
@@ -284,7 +284,7 @@ const PHASES = [
     startDirection: 'right',
     hasBoss: true,
     exitInitiallyOpen: false,
-    objectiveHint: '⬅ Depois de falar com o gerente, volte e saia do Sebrae.',
+    //objectiveHint: '⬅ Depois de falar com o gerente, volte e saia do Sebrae.',
     showExitArrow: true,
     exitDirection: 'backward', // seta aponta pra trás (saindo da empresa)
     phaseNumber: 2,
@@ -308,7 +308,7 @@ const PHASES = [
       name: 'Gerente do Sebrae',
       portrait: { idle: 'boss2_idle.png', talk: 'boss2_talk.png' },
       portraitHeight: 90,
-      greeting: 'Seja bem-vindo ao Sebrae RN. Meu nome é Leonel Pontes, sou o responsável por este escritório. Antes de prosseguirmos, gostaria de avaliar seus conhecimentos sobre a organização financeira de uma empresa.',
+      greeting: 'Seja bem-vindo ao Sebrae RN. Sou Leonel Pontes e vou avaliar seus conhecimentos sobre organização financeira.',
       introLines: [
         'Vamos à primeira questão:',
         'Muito bem. Sigamos para a próxima:',
@@ -332,133 +332,133 @@ const PHASES = [
       },
       questions: [
         {
-          q: "Todo mês ou trimestre, a empresa recolhe seus impostos por meio de uma guia. Para que serve essa guia?",
+          q: "Para que serve a guia DAS?",
           options: [
-            "É o comprovante utilizado para registrar oficialmente o pagamento dos tributos devidos pela empresa naquele período",
-            "É um boleto emitido automaticamente apenas quando a empresa atrasa o pagamento de algum imposto",
-            "É um documento interno utilizado somente para organização financeira da empresa, sem validade perante o governo",
-            "É um documento obrigatório apenas para empresas de grande porte que possuem muitos funcionários"
+            "Comprovar o pagamento dos impostos",
+            "Aplicar multa por atraso",
+            "Organizar documentos internos",
+            "Servir apenas para grandes empresas"
           ],
           correct: 0,
           explanation:
-            "Essa guia comprova o pagamento dos tributos devidos pela empresa naquele período. No Simples Nacional, ela é chamada de DAS e reúne vários impostos em um único pagamento."
+            "No Simples Nacional, a DAS reúne vários impostos em uma única guia e comprova que eles foram pagos."
         },
 
         {
-          q: "A empresa pode escolher entre diferentes formas de calcular o imposto sobre o lucro. O que isso significa?",
+          q: "Escolher o regime tributário:",
           options: [
-            "Todas as empresas pagam exatamente o mesmo valor de imposto, independentemente do regime escolhido",
-            "Existem regras diferentes, e o regime escolhido pode aumentar ou diminuir o quanto a empresa paga de imposto",
-            "Somente empresas que apresentam prejuízo durante o ano podem optar por outro regime tributário",
-            "O regime tributário é definido automaticamente pelo banco onde a empresa possui sua conta empresarial"
+            "Não altera os impostos da empresa",
+            "Pode mudar quanto a empresa paga de impostos",
+            "Só importa para empresas com prejuízo",
+            "É uma decisão tomada pelo banco"
           ],
           correct: 1,
           explanation:
-            "Cada regime tributário possui regras próprias para calcular os impostos. Por isso, uma escolha adequada pode reduzir custos e evitar que a empresa pague mais do que deveria."
+            "Cada regime possui regras diferentes. Escolher o mais adequado pode reduzir custos e evitar pagamentos desnecessários."
         },
 
         {
-          q: "Para que serve, na prática, o Balanço Patrimonial?",
+          q: "O Balanço Patrimonial mostra:",
           options: [
-            "Mostrar apenas quanto a empresa vendeu durante o último dia útil do mês",
-            "Mostrar uma 'fotografia' da situação financeira da empresa: o que ela tem, o que deve e o que sobra para os sócios",
-            "Servir exclusivamente como documento exigido pelos bancos para aprovação de financiamentos",
-            "Substituir as notas fiscais emitidas durante o funcionamento normal da empresa"
+            "As vendas realizadas no dia",
+            "A situação financeira da empresa",
+            "Somente dados para empréstimos",
+            "As notas fiscais emitidas"
           ],
           correct: 1,
           explanation:
-            "O Balanço Patrimonial funciona como uma fotografia da empresa em uma data específica. Ele mostra seus bens, seus direitos, suas dívidas e o patrimônio que pertence aos sócios."
+            "O Balanço Patrimonial apresenta os bens, as dívidas e o patrimônio da empresa em uma data específica."
         },
 
         {
           q: "O que é o Simples Nacional?",
           options: [
-            "Uma obrigação criada exclusivamente para empresas de grande porte que possuem alto faturamento",
-            "Um aplicativo desenvolvido pelo governo para emissão de boletos e pagamento de tributos",
-            "Uma linha especial de crédito destinada às pequenas empresas em fase de crescimento",
-            "Um regime tributário simplificado, criado para facilitar o pagamento de impostos de pequenas e médias empresas"
+            "Regime que facilita os impostos de pequenas empresas",
+            "Aplicativo para pagar tributos",
+            "Linha de crédito empresarial",
+            "Regime exclusivo para grandes empresas"
           ],
-          correct: 3,
+          correct: 0,
           explanation:
-            "O Simples Nacional é um regime tributário que simplifica o recolhimento de impostos para empresas que atendem aos seus requisitos, reunindo vários tributos em uma única guia."
+            "O Simples Nacional simplifica o pagamento de impostos ao reunir diversos tributos em uma única guia."
         },
 
         {
-          q: "Todo ano, muitas empresas precisam entregar uma declaração informando ao governo o quanto faturaram. Para que serve essa declaração?",
+          q: "A declaração anual de faturamento serve para:",
           options: [
-            "Substitui completamente a necessidade de pagar os impostos mensais da empresa",
-            "É apenas uma formalidade administrativa que não gera nenhuma consequência caso não seja enviada",
-            "Para o governo confirmar se os impostos pagos estão de acordo com o movimento real da empresa",
-            "É uma obrigação exclusiva para empresas que encerraram o ano com prejuízo financeiro"
+            "Conferir se os impostos estão corretos",
+            "Substituir os pagamentos mensais",
+            "Informar apenas empresas com prejuízo",
+            "Cumprir uma formalidade sem efeitos"
           ],
-          correct: 2,
+          correct: 0,
           explanation:
-            "Essa declaração funciona como uma prestação de contas. Por meio dela, o governo verifica se o faturamento informado e os impostos pagos pela empresa estão corretos."
+            "Ela permite que o governo compare o faturamento informado com os impostos pagos pela empresa."
         },
 
         {
-          q: "Qual é a diferença entre faturamento e lucro?",
+          q: "Qual a diferença entre faturamento e lucro?",
           options: [
-            "Representam exatamente o mesmo conceito financeiro, mudando apenas o nome utilizado",
-            "Faturamento é tudo o que a empresa recebeu com vendas; lucro é o que sobra depois de pagar todas as despesas",
-            "Faturamento corresponde somente ao valor que sobra disponível no caixa ao final do mês",
-            "O lucro sempre será maior que o faturamento quando a empresa possui boa administração financeira"
+            "São exatamente a mesma coisa",
+            "Faturamento é receita; lucro é o que sobra",
+            "Faturamento é o dinheiro em caixa",
+            "Lucro sempre é maior que o faturamento"
           ],
           correct: 1,
           explanation:
-            "O faturamento representa o total recebido pelas vendas ou serviços. Já o lucro é o valor que sobra depois que todas as despesas e obrigações são pagas."
+            "Faturamento é tudo o que a empresa recebe com vendas. Lucro é o valor restante após pagar todas as despesas."
         },
 
         {
-          q: "O que é a folha de pagamento de uma empresa?",
+          q: "O que é a folha de pagamento?",
           options: [
-            "Uma lista contendo apenas os nomes e cargos dos funcionários contratados pela empresa",
-            "O conjunto de cálculos e obrigações relacionados aos salários e encargos dos funcionários",
-            "Um relatório financeiro utilizado exclusivamente para registrar as vendas realizadas pela empresa",
-            "O documento responsável por registrar todas as compras de materiais e equipamentos da empresa"
+            "Lista com os nomes dos funcionários",
+            "Cálculo de salários e encargos",
+            "Relatório das vendas da empresa",
+            "Registro das compras realizadas"
           ],
           correct: 1,
           explanation:
-            "A folha de pagamento reúne os salários e todos os cálculos relacionados aos funcionários, como férias, décimo terceiro, descontos, benefícios e contribuições."
+            "A folha reúne salários, descontos, benefícios e encargos trabalhistas de todos os funcionários."
         },
 
         {
           q: "O que é o pró-labore?",
           options: [
-            "Um imposto obrigatório cobrado exclusivamente das empresas de grande porte",
-            "A remuneração que o sócio recebe pelo trabalho que exerce na própria empresa",
-            "O valor distribuído entre os sócios apenas no encerramento do exercício financeiro anual",
-            "Uma taxa administrativa cobrada pela prefeitura para permitir o funcionamento da empresa"
+            "Imposto pago pelas empresas",
+            "Remuneração do sócio pelo trabalho",
+            "Distribuição anual dos lucros",
+            "Taxa cobrada pela prefeitura"
           ],
           correct: 1,
           explanation:
-            'O pró-labore é a remuneração recebida pelo sócio pelo trabalho que realiza na empresa. Ele funciona como uma espécie de "salário do sócio", mas não é a mesma coisa que distribuição de lucros.'
+            "O pró-labore é a remuneração do sócio que trabalha na empresa e é diferente da distribuição de lucros."
         },
 
         {
-          q: "O que é a DRE, ou Demonstração do Resultado do Exercício?",
+          q: "O que mostra a DRE?",
           options: [
-            "Um relatório que mostra se a empresa teve lucro ou prejuízo em determinado período",
-            "O documento utilizado para comprovar o pagamento de todos os impostos recolhidos pela empresa",
-            "Uma relação completa dos bens, equipamentos e imóveis pertencentes à empresa",
-            "Um documento exigido apenas durante o processo de abertura e registro da empresa"
+            "Se a empresa teve lucro ou prejuízo",
+            "Os impostos pagos pela empresa",
+            "Os bens e equipamentos da empresa",
+            "Os documentos da abertura da empresa"
           ],
           correct: 0,
           explanation:
-            'A DRE mostra as receitas, os custos e as despesas da empresa durante um período, permitindo descobrir se ela teve lucro ou prejuízo. Enquanto o Balanço é uma "foto", a DRE mostra o desempenho ao longo do tempo.'
+            "A DRE apresenta receitas, custos e despesas, mostrando o resultado financeiro de um período."
         },
 
         {
-          q: "Por que é importante separar as finanças pessoais das finanças da empresa?",
+          q: "Por que separar as finanças da empresa?",
           options: [
-            "Não é necessário separar as contas, pois a empresa e o proprietário podem utilizar os mesmos recursos livremente",
-            "Para ter controle real do desempenho do negócio e evitar problemas contábeis e fiscais",
-            "Porque toda empresa é obrigada por lei a encerrar definitivamente a conta pessoal do proprietário",
-            "A separação existe apenas para facilitar a organização visual dos extratos bancários e documentos"
+            "Não é necessário separar",
+            "Para controlar melhor o negócio",
+            "Porque a conta pessoal é proibida",
+            "Apenas para organizar documentos"
           ],
           correct: 1,
           explanation:
-            "Quando as contas pessoais e empresariais são misturadas, fica difícil saber se o negócio realmente está dando lucro. A separação também facilita o controle contábil e evita problemas fiscais."
+            "Separar as contas facilita o controle financeiro, evita erros contábeis e ajuda a avaliar o desempenho da empresa."
         }
       ],
     },
@@ -492,7 +492,7 @@ const PHASES = [
       },
       {
         type: 'player',
-        text: 'Pronto! Meu CNPJ está aberto. Agora vamos pra cima!',
+        text: 'Pronto! Meu CNPJ está aberto. Agora é hora de colocar a empresa em funcionamento!',
         duration: 3500,
       },
     ],
@@ -551,7 +551,7 @@ const PHASES = [
       { x: 720, y: 280, text: 'Sou cliente da JS Grilo Contabilidade & Gestão há um tempo, recomendo demais, são muito bons no que fazem!' },
     ],
   },
-  { 
+  {
     id: 'fase3',
     name: 'JS Grilo Contabilidade & Gestão',
     startX: 80,
@@ -595,123 +595,133 @@ const PHASES = [
       },
       questions: [
         {
-          q: "O Brasil está passando por uma reforma tributária que simplifica os impostos sobre consumo. Na prática, o que ela faz?",
+          q: "A Reforma Tributária une alguns impostos em:",
           options: [
-            "Cria um modelo único de Imposto de Renda para pessoas físicas e jurídicas, substituindo as faixas e regras atuais",
-            "Junta vários impostos que hoje existem separadamente, como PIS, Cofins, ICMS e ISS, em novos tributos chamados CBS e IBS",
-            "Elimina todos os tributos federais incidentes sobre produtos e serviços comercializados no território nacional",
-            "Altera apenas a forma de tributação dos Microempreendedores Individuais, sem afetar as demais empresas"
+            "Um único Imposto de Renda",
+            "CBS e IBS",
+            "O fim dos tributos federais",
+            "Mudanças apenas para o MEI"
           ],
           correct: 1,
-          explanation: "A Reforma Tributária busca simplificar o sistema brasileiro, substituindo diversos tributos sobre o consumo por dois novos: a CBS e o IBS. Isso torna as regras mais claras e reduz a complexidade para empresas e contribuintes."
+          explanation:
+            "A Reforma Tributária substitui diversos impostos sobre o consumo por dois novos tributos: CBS e IBS, tornando o sistema mais simples."
         },
 
         {
-          q: "A reforma tributária também criou o chamado Imposto Seletivo. O que ele faz?",
+          q: "O Imposto Seletivo incide sobre:",
           options: [
-            "Substitui o Imposto de Renda cobrado das pessoas físicas que ultrapassam determinado limite de rendimento anual",
-            "Cobra um valor extra sobre produtos prejudiciais à saúde ou ao meio ambiente, como cigarros e bebidas alcoólicas",
-            "É cobrado exclusivamente de empreendedores que abrem uma nova empresa ou alteram sua atividade econômica",
-            "Concede um desconto tributário aos consumidores que compram produtos recicláveis ou ambientalmente sustentáveis"
+            "Rendimentos do Imposto de Renda",
+            "Produtos nocivos à saúde ou ao meio ambiente",
+            "Empresas recém-criadas",
+            "Produtos considerados sustentáveis"
           ],
           correct: 1,
-          explanation: "O Imposto Seletivo incide sobre produtos considerados prejudiciais à saúde ou ao meio ambiente. Por isso, ele ficou conhecido como o 'imposto do pecado'."
+          explanation:
+            "O Imposto Seletivo é aplicado sobre produtos que causam impactos à saúde ou ao meio ambiente, como cigarros e bebidas alcoólicas."
         },
 
         {
-          q: "Quando duas empresas do mesmo grupo fazem negócio entre si e o produto ainda não foi revendido para fora do grupo, o que acontece com esse lucro na consolidação?",
+          q: "Lucro entre empresas do mesmo grupo é:",
           options: [
-            "O lucro é reconhecido integralmente, pois a operação ocorreu entre duas empresas juridicamente independentes",
-            "O lucro é retirado das demonstrações, porque ainda não representa um ganho real para o grupo perante terceiros",
-            "O lucro é registrado em dobro, uma vez que aparece simultaneamente na empresa compradora e na vendedora",
-            "O lucro é convertido em uma obrigação financeira da empresa que adquiriu o produto dentro do grupo"
+            "Reconhecido normalmente",
+            "Eliminado até virar lucro real",
+            "Registrado em dobro",
+            "Transformado em dívida"
           ],
           correct: 1,
-          explanation: "Na consolidação das demonstrações financeiras, esse lucro é eliminado, pois a operação aconteceu apenas dentro do próprio grupo empresarial e ainda não gerou um ganho efetivo perante terceiros."
+          explanation:
+            "Enquanto a operação ocorrer apenas dentro do grupo, esse lucro é eliminado na consolidação das demonstrações financeiras."
         },
 
         {
-          q: "O que é o período de transição da Reforma Tributária?",
+          q: "O período de transição da reforma é:",
           options: [
-            "O prazo em que os tributos antigos e os novos coexistirão gradualmente até ocorrer a substituição completa",
-            "O período temporário em que as empresas ficam dispensadas do pagamento de tributos sobre o consumo",
-            "O prazo concedido ao proprietário para decidir se deseja manter ou encerrar definitivamente a empresa",
-            "Um benefício fiscal temporário destinado exclusivamente aos Microempreendedores Individuais formalizados"
+            "Troca gradual dos tributos antigos pelos novos",
+            "Período sem cobrança de impostos",
+            "Prazo para encerrar empresas",
+            "Benefício exclusivo do MEI"
           ],
           correct: 0,
-          explanation: "A mudança não acontece de uma única vez. Durante alguns anos, os tributos atuais e os novos coexistirão para permitir uma adaptação gradual de empresas, governos e contribuintes."
+          explanation:
+            "Durante a transição, os tributos atuais e os novos coexistem para permitir uma adaptação gradual."
         },
 
         {
-          q: "O que significa dizer que a CBS e o IBS serão tributos não cumulativos?",
+          q: "CBS e IBS 'não cumulativos' significa:",
           options: [
-            "Significa que esses tributos não poderão aparecer mais de uma vez no mesmo documento fiscal emitido pela empresa",
-            "A empresa pode descontar do imposto devido os valores pagos nas etapas anteriores da cadeia produtiva",
-            "Os tributos serão cobrados apenas uma vez durante todo o período de funcionamento da empresa",
-            "As empresas não poderão utilizar créditos tributários relacionados às compras e despesas realizadas"
+            "O imposto aparece apenas uma vez na nota",
+            "Permitem descontar o imposto pago antes",
+            "São cobrados uma única vez na empresa",
+            "Não geram créditos tributários"
           ],
           correct: 1,
-          explanation: "A não cumulatividade evita o chamado 'imposto sobre imposto'. Assim, a empresa aproveita créditos referentes às etapas anteriores da produção."
+          explanation:
+            "A empresa pode aproveitar créditos dos impostos pagos nas etapas anteriores, evitando o chamado 'imposto sobre imposto'."
         },
 
         {
-          q: "O que costuma ser feito, do ponto de vista contábil, no encerramento do exercício de uma empresa?",
+          q: "No encerramento do exercício a empresa:",
           options: [
-            "A empresa encerra formalmente suas atividades e realiza uma nova abertura para iniciar o exercício seguinte",
-            "São apurados os resultados do período e organizadas as contas para elaborar as demonstrações contábeis",
-            "Os tributos ainda não pagos durante o ano são automaticamente cancelados pelos órgãos responsáveis",
-            "Os contratos de trabalho são encerrados para que os funcionários sejam novamente registrados no ano seguinte"
+            "Fecha e reabre suas atividades",
+            "Apura resultados e prepara relatórios",
+            "Recebe perdão automático de impostos",
+            "Encerra todos os contratos de trabalho"
           ],
           correct: 1,
-          explanation: "No encerramento do exercício, a contabilidade apura os resultados da empresa e prepara as demonstrações contábeis que representam tudo o que aconteceu durante o ano."
+          explanation:
+            "Nesse momento, a empresa organiza suas contas e elabora as demonstrações contábeis do período."
         },
 
         {
-          q: "O que é a consolidação das demonstrações financeiras de um grupo de empresas?",
+          q: "Consolidar balanços de um grupo é:",
           options: [
-            "É a soma direta de todos os balanços das empresas, sem excluir transações ou realizar qualquer tipo de ajuste",
-            "É a união das demonstrações das empresas do grupo em um único conjunto, eliminando operações entre elas",
-            "É um relatório institucional elaborado exclusivamente para divulgar os resultados do grupo ao mercado",
-            "É uma declaração tributária utilizada para reunir e calcular todos os impostos federais das empresas"
+            "Somar os balanços sem ajustes",
+            "Unir as demonstrações eliminando operações internas",
+            "Criar um relatório de marketing",
+            "Declarar todos os impostos do grupo"
           ],
           correct: 1,
-          explanation: "A consolidação reúne as informações das empresas do grupo como se todas formassem uma única organização, eliminando transações realizadas entre elas."
+          explanation:
+            "A consolidação reúne as empresas do grupo como se fossem uma só, eliminando transações entre elas."
         },
 
         {
-          q: "O que é a Escrituração Contábil Digital (ECD), também chamada de SPED Contábil?",
+          q: "A ECD (SPED Contábil) é:",
           options: [
-            "Uma plataforma de comércio eletrônico utilizada pelas empresas para registrar vendas e emitir pedidos online",
-            "O envio digital da contabilidade da empresa ao governo, substituindo os antigos livros contábeis em papel",
-            "Uma modalidade de empréstimo disponibilizada por bancos para financiar a modernização das empresas",
-            "Uma declaração eletrônica destinada exclusivamente às pessoas físicas que possuem rendimentos empresariais"
+            "Uma plataforma de vendas",
+            "A contabilidade digital enviada ao governo",
+            "Uma linha de crédito empresarial",
+            "Uma declaração exclusiva para pessoas físicas"
           ],
           correct: 1,
-          explanation: "A ECD faz parte do SPED e permite que os livros contábeis sejam enviados digitalmente ao governo, substituindo os antigos registros em papel."
+          explanation:
+            "A ECD substitui os antigos livros contábeis em papel pelo envio digital das informações ao governo."
         },
 
         {
-          q: "Com a Reforma Tributária, uma das mudanças é que o imposto passará a ser mostrado 'por fora' na nota fiscal. O que isso significa para o consumidor?",
+          q: "Imposto 'por fora' na nota significa:",
           options: [
-            "O preço final dos produtos e serviços será reduzido automaticamente após a implantação do novo sistema",
-            "Ficará mais claro quanto do valor pago pelo consumidor corresponde aos impostos cobrados na operação",
-            "O consumidor deixará de pagar tributos sobre os produtos e serviços adquiridos no mercado",
-            "Os produtos não terão mais impostos considerados na composição do preço apresentado ao consumidor"
+            "O preço diminui automaticamente",
+            "O valor do imposto fica mais transparente",
+            "Os impostos deixam de existir",
+            "O produto não possui tributos"
           ],
           correct: 1,
-          explanation: "A proposta é tornar o sistema mais transparente, permitindo que o consumidor visualize claramente quanto do preço corresponde aos tributos."
+          explanation:
+            "O consumidor consegue visualizar com mais clareza quanto do valor pago corresponde aos tributos."
         },
 
         {
-          q: "Ao comprar outra empresa por um valor acima do que vale seu patrimônio líquido, como costuma ser chamada essa diferença?",
+          q: "O que é o ágio (goodwill)?",
           options: [
-            "Depreciação acumulada, correspondente à perda de valor dos bens e ativos adquiridos na operação",
-            "Ágio, ou goodwill, normalmente relacionado às expectativas de lucros e benefícios econômicos futuros",
-            "Provisão para devedores duvidosos, destinada a cobrir possíveis perdas com clientes inadimplentes",
-            "Capital de giro, utilizado para financiar as despesas operacionais e manter as atividades da empresa"
+            "Perda de valor dos bens da empresa",
+            "Valor pago acima do patrimônio esperado",
+            "Provisão para possíveis dívidas",
+            "Capital usado nas operações diárias"
           ],
           correct: 1,
-          explanation: "Esse valor adicional é conhecido como ágio, ou goodwill. Ele representa benefícios esperados, como marca, reputação, carteira de clientes e potencial de geração de lucros futuros."
+          explanation:
+            "O ágio representa o valor pago além do patrimônio da empresa, considerando benefícios futuros como marca, clientes e potencial de lucro."
         }
       ],
     },
