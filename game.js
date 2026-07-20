@@ -13,7 +13,7 @@ const MAX_LIVES = 6;
 const INFO_PROXIMITY_RADIUS = 90; // px — raio em que o mural fica visível
 const ANSWER_SECONDS = 30;  // tempo pra responder depois que as alternativas aparecem
 const ONCE_BUBBLE_MIN_MS = 4500; // tempo mínimo que um mural "de uso único" fica aberto, mesmo andando
-const NARRATIVE_TYPE_SPEED_MS = 35;
+const NARRATIVE_TYPE_SPEED_MS = 45;
 const NARRATIVE_DEFAULT_DURATION_MS = 4000;
 // ---------------------------------------------------------
 // TEMA / IDENTIDADE VISUAL (deve bater com :root em style.css)
@@ -264,6 +264,7 @@ const PHASES = [
     startDirection: 'right',
     hasBoss: true,
     exitInitiallyOpen: false,
+    objectiveHint: '⬅ Depois de falar com o gerente, volte e saia do Sebrae.',
     showExitArrow: true,
     exitDirection: 'backward', // seta aponta pra trás (saindo da empresa)
     phaseNumber: 2,
@@ -447,6 +448,7 @@ const PHASES = [
     name: 'O Início de uma Nova Jornada',
     phaseNumber: 2,
     phaseLabel: 'Interlúdio',
+    objectiveHint: '⬅ Siga à esquerda até a próxima rua.',
     skyColor: 0x18233d,
     groundColor: 0x2c3350,
     decorColor: 0x22304f,
@@ -466,12 +468,12 @@ const PHASES = [
       {
         type: 'narrator',
         text: 'Após concluir o processo de formalização, a empresa finalmente estava pronta para começar.',
-        duration: 2000,
+        duration: 3500,
       },
       {
         type: 'player',
         text: 'Pronto! Meu CNPJ está aberto. Agora vamos pra cima!',
-        duration: 2000,
+        duration: 3500,
       },
     ],
     infoSpots: [
@@ -486,6 +488,7 @@ const PHASES = [
     phaseNumber: 2,
     phaseLabel: 'Algum tempo depois',
     skyColor: 0x18233d,
+    objectiveHint: '⬅ Continue à esquerda até chegar na JS Grilo.',
     groundColor: 0x2c3350,
     decorColor: 0x22304f,
     levelWidth: 1990,
@@ -504,22 +507,22 @@ const PHASES = [
       {
         type: 'narrator',
         text: 'Algum tempo depois...',
-        duration: 2000,
+        duration: 3500,
       },
       {
         type: 'narrator',
         text: 'A empresa começou a crescer. Novos clientes chegaram e as responsabilidades aumentaram.',
-        duration: 2000,
+        duration: 3500,
       },
       {
         type: 'player',
         text: 'Minha empresa está crescendo, mas preciso de ajuda para organizar tudo.',
-        duration: 2000,
+        duration: 3500,
       },
       {
         type: 'player',
         text: 'Ouvi falar muito bem da JS Grilo Contabilidade & Gestão. Vou procurar a equipe deles.',
-        duration: 2000,
+        duration: 3500,
       },
     ],
     infoSpots: [
@@ -732,6 +735,9 @@ function shuffleQuestion(question) {
 }
 
 function updateHUD() {
+  const currentPhase = PHASES[GameData.phaseIndex];
+
+  document.getElementById('hud-objective').textContent = currentPhase?.objectiveHint ?? '';
   document.getElementById('hud-lives').textContent =
     '❤️'.repeat(Math.max(GameData.lives, 0)) || '💀';
 
@@ -739,10 +745,7 @@ function updateHUD() {
     GameData.correctAnswers * 100 +
     GameData.lives * 150;
 
-  document.getElementById('score-value').textContent =
-    partialScore;
-
-  const currentPhase = PHASES[GameData.phaseIndex];
+  document.getElementById('score-value').textContent = partialScore;
 
   if (!currentPhase) return;
 
@@ -826,6 +829,33 @@ class KeyboardInputProvider {
   isLeft() { return this.cursors.left.isDown || this.keys.A.isDown; }
   isRight() { return this.cursors.right.isDown || this.keys.D.isDown; }
 }
+class TouchInputProvider {
+  constructor() {
+    this.leftDown = false;
+    this.rightDown = false;
+
+    const bind = (el, setter) => {
+      if (!el) return;
+      const start = (e) => { e.preventDefault(); setter(true); };
+      const end = (e) => { e.preventDefault(); setter(false); };
+      el.addEventListener('touchstart', start, { passive: false });
+      el.addEventListener('touchend', end);
+      el.addEventListener('touchcancel', end);
+      el.addEventListener('mousedown', start);
+      el.addEventListener('mouseup', end);
+      el.addEventListener('mouseleave', end);
+    };
+
+    bind(document.getElementById('btn-left'), (v) => { this.leftDown = v; });
+    bind(document.getElementById('btn-right'), (v) => { this.rightDown = v; });
+  }
+  isLeft() { return this.leftDown; }
+  isRight() { return this.rightDown; }
+}
+
+// Instância única — criada uma vez só (os botões são elementos HTML fora do Phaser,
+// não recriar isso a cada fase, senão os cliques duplicam)
+const touchInput = new TouchInputProvider();
 
 // TODO (futuro): class TouchInputProvider { ... }  -> botões on-screen
 // TODO (futuro): class GamepadInputProvider { ... } -> this.scene.input.gamepad
@@ -834,7 +864,7 @@ class KeyboardInputProvider {
 
 class InputManager {
   constructor(scene) {
-    this.providers = [new KeyboardInputProvider(scene)];
+    this.providers = [new KeyboardInputProvider(scene), touchInput];
     this.enabled = true;
   }
   setEnabled(v) { this.enabled = v; }
@@ -957,10 +987,10 @@ function positionBossDialogue(scene, bossSprite) {
 
   let bottom = 540 - screenTopY + 26;
   const boxHeight = dialogueEl.offsetHeight;
-  const maxBottom = 540 - 10 - boxHeight; // deixa no mínimo 10px de folga no topo da tela
-  if (boxHeight > 0 && bottom > maxBottom) {
-    bottom = Math.max(maxBottom, 10);
-  }
+  const maxBottom = 540 - 50 - boxHeight; // deixa folga maior no topo (o cronômetro ocupa esse canto)
+if (boxHeight > 0 && bottom > maxBottom) {
+  bottom = Math.max(maxBottom, 10);
+}
   dialogueEl.style.bottom = `${bottom}px`;
 }
 
@@ -981,8 +1011,8 @@ const BOSS_WRONG_LINES = [
   'Quase! Deixa eu te explicar:',
   'Essa é traiçoeira, mas vamos entender:',
 ];
-const TYPE_SPEED_MS = 45; // velocidade da digitação (ms por letra) — aumente pra deixar mais devagar, diminua pra mais rápido
-const INFO_TYPE_SPEED_MS = 30;
+const TYPE_SPEED_MS = 60; // velocidade da digitação (ms por letra) — aumente pra deixar mais devagar, diminua pra mais rápido
+const INFO_TYPE_SPEED_MS = 35;
 
 function pickLine(list, index) {
   return list[Math.min(index, list.length - 1)];
@@ -1057,7 +1087,7 @@ function startBossBattle(scene, phaseConfig, bossSprite, onComplete) {
       setTimeout(() => {
         if (isStale()) return;
         typeText(q.q, () => revealOptions(q));
-      }, 700);
+      }, 900);
     });
   }
 
@@ -1116,7 +1146,7 @@ function startBossBattle(scene, phaseConfig, bossSprite, onComplete) {
 
     typeText(resultText, () => {
       if (isStale()) return;
-      const waitTime = isCorrect ? 1400 : 4200;
+      const waitTime = isCorrect ? 1400 : 3200;
       setTimeout(() => {
         if (isStale()) return;
         qIndex += 1;
@@ -1145,7 +1175,7 @@ function startBossBattle(scene, phaseConfig, bossSprite, onComplete) {
           overlay.classList.add('hidden');
           finishBossUI();
           onComplete();
-        }, 2800);
+        }, 1800);
       });
     } else {
       overlay.classList.add('hidden');

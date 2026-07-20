@@ -464,9 +464,8 @@ body {
 
 .dialogue-badge {
   position: absolute;
-  top: -26px;
-  /* mais afastado do topo do balão pra não ficar colado */
-  right: 4px;
+  top: 16px;
+  right: 16px;
   background: var(--color-primary);
   border: 2px solid var(--color-accent);
   color: var(--color-accent);
@@ -474,7 +473,7 @@ body {
   padding: 5px 8px;
   border-radius: 12px;
   white-space: nowrap;
-  z-index: 2;
+  z-index: 20;
 }
 
 /* ---------- Painel de respostas: fixo do lado esquerdo da tela ---------- */
@@ -804,3 +803,31 @@ button:hover {
   padding-left: 20px;
   margin: 0;
 }
+
+#touch-controls {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  gap: 16px;         /* botões coladinhos um no outro, com um respiro pequeno */
+  z-index: 6;
+  pointer-events: none;
+}
+
+.touch-btn {
+  pointer-events: auto;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(11, 21, 38, 0.75);
+  border: 2px solid var(--color-accent);
+  color: var(--color-accent-light);
+  font-size: 28px;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.touch-btn:active { background: rgba(242, 169, 0, 0.35); }
