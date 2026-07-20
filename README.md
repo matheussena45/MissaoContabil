@@ -1,3 +1,3 @@
 # Missão Contabil
 
-https://github.com/matheussena45/MissaoContabil/index.html
+https://matheussena45.github.io/MissaoContabil/index.html
