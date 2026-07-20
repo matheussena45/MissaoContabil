@@ -32,6 +32,26 @@ const THEME = {
 };
 
 // ---------------------------------------------------------
+// ÁUDIO
+// ---------------------------------------------------------
+const SFX = {
+  bgm: new Audio('assets/audio/bgm.mp3'),
+  type: new Audio('assets/audio/type_blip.wav'),
+  tick: new Audio('assets/audio/countdown_tick.wav'),
+};
+SFX.bgm.loop = true;
+SFX.bgm.volume = 0.25; // volume moderado — não briga com os efeitos
+SFX.type.volume = 0.5;
+SFX.tick.volume = 0.6;
+
+function playSfx(audio) {
+  try { audio.currentTime = 0; audio.play(); } catch (e) { /* ignora erro de autoplay */ }
+}
+function startBgm() {
+  SFX.bgm.play().catch(() => { }); // navegadores só liberam áudio após interação do usuário
+}
+
+// ---------------------------------------------------------
 // PERSONAGENS JOGÁVEIS
 // Para adicionar um novo (ex: uma variação mulher), basta:
 //  1. Colocar Idle.png e Walk.png em assets/characters/<id>/
@@ -741,11 +761,7 @@ function updateHUD() {
   document.getElementById('hud-lives').textContent =
     '❤️'.repeat(Math.max(GameData.lives, 0)) || '💀';
 
-  const partialScore =
-    GameData.correctAnswers * 100 +
-    GameData.lives * 150;
-
-  document.getElementById('score-value').textContent = partialScore;
+  document.getElementById('score-value').textContent = GameData.score;
 
   if (!currentPhase) return;
 
@@ -801,12 +817,9 @@ function escapeHtml(str) {
 // Considera SOMENTE: acertos, vidas restantes e tempo total.
 // Exploração/murais NÃO entram na conta (só servem para aprender).
 // ---------------------------------------------------------
-function computeFinalScore(elapsedSeconds) {
-  const correctPoints = GameData.correctAnswers * 100;      // até 900 (9 perguntas)
-  const livesPoints = GameData.lives * 150;                  // até 450 (3 vidas)
-  // Bônus de agilidade: quanto mais rápido concluir, mais pontos (sem punir demais quem explora)
-  const timeBonus = Math.max(0, Math.round((600 - elapsedSeconds) * 0.5)); // até 300 se concluir em <10min
-  return correctPoints + livesPoints + timeBonus;
+function computeFinalScore() {
+  const livesBonus = GameData.lives * 50; // bônus final por vida restante — ajuste esse valor à vontade
+  return GameData.score + livesBonus;
 }
 
 function formatMessageForScore(score) {
@@ -1040,6 +1053,7 @@ function startBossBattle(scene, phaseConfig, bossSprite, onComplete) {
     .map((question) => shuffleQuestion(question));
   let qIndex = 0;
   let battleCorrectCount = 0;
+  let timeLeft = ANSWER_SECONDS;
   let timerInterval = null;
   let typeInterval = null;
   const typeState = { instant: false };
@@ -1058,7 +1072,7 @@ function startBossBattle(scene, phaseConfig, bossSprite, onComplete) {
       if (isStale()) { clearInterval(typeInterval); scene.stopBossTalkAnim?.(); return; }
       if (typeState.instant) {
         questionEl.textContent = text;
-        positionBossDialogue(scene, bossSprite);   // <-- adiciona
+        positionBossDialogue(scene, bossSprite);
         clearInterval(typeInterval);
         scene.stopBossTalkAnim?.();
         if (onDone) onDone();
@@ -1066,7 +1080,8 @@ function startBossBattle(scene, phaseConfig, bossSprite, onComplete) {
       }
       i += 1;
       questionEl.textContent = text.slice(0, i);
-      positionBossDialogue(scene, bossSprite);      // <-- adiciona
+      playSfx(SFX.type);                          // <-- aqui
+      positionBossDialogue(scene, bossSprite);
       if (i >= text.length) {
         clearInterval(typeInterval);
         scene.stopBossTalkAnim?.();
@@ -1109,7 +1124,7 @@ function startBossBattle(scene, phaseConfig, bossSprite, onComplete) {
       optionsEl.appendChild(btn);
     });
 
-    let timeLeft = ANSWER_SECONDS;
+    timeLeft = ANSWER_SECONDS; // reinicia (sem "let" — já é a variável compartilhada lá de cima)
     headerEl.textContent = `⏱ ${timeLeft}s`;
     clearInterval(timerInterval);
     timerInterval = setInterval(() => {
@@ -1126,23 +1141,34 @@ function startBossBattle(scene, phaseConfig, bossSprite, onComplete) {
   // Etapa 3: boss reage (parabeniza ou explica o motivo do erro), depois avança
   function resolveAnswer(chosenIdx, q) {
     if (isStale()) return;
-    const isCorrect = chosenIdx === q.correct;
+    const timedOut = chosenIdx === null;
+    const isCorrect = !timedOut && chosenIdx === q.correct;
     answersPanelEl.classList.add('hidden');
 
     if (isCorrect) {
       GameData.correctAnswers += 1;
       battleCorrectCount += 1;
+
+      const BASE_POINTS = 60;       // todo acerto garante isso
+      const MAX_SPEED_BONUS = 40;   // até isso a mais, se responder na hora
+      const speedBonus = Math.round((timeLeft / ANSWER_SECONDS) * MAX_SPEED_BONUS);
+      GameData.score += BASE_POINTS + speedBonus; // acerto rápido = até 100 pts; no fim do tempo = 60 pts
     } else {
-      GameData.lives -= 1;
+      GameData.lives -= 1; // errar (ou tempo esgotado) não soma nada
     }
     updateHUD();
 
     const correctLines = phaseConfig.boss.correctLines || BOSS_CORRECT_LINES;
     const wrongLines = phaseConfig.boss.wrongLines || BOSS_WRONG_LINES;
 
-    const resultText = isCorrect
-      ? pickLine(correctLines, qIndex)
-      : `${pickLine(wrongLines, qIndex)} ${q.explanation}`;
+    let resultText;
+    if (isCorrect) {
+      resultText = pickLine(correctLines, qIndex);
+    } else if (timedOut) {
+      resultText = `O tempo acabou! Essa questão foi considerada incorreta. ${q.explanation}`;
+    } else {
+      resultText = `${pickLine(wrongLines, qIndex)} ${q.explanation}`;
+    }
 
     typeText(resultText, () => {
       if (isStale()) return;
@@ -1152,7 +1178,7 @@ function startBossBattle(scene, phaseConfig, bossSprite, onComplete) {
         qIndex += 1;
         if (GameData.lives <= 0) {
           overlay.classList.add('hidden');
-          finishBossUI();
+          finishBossUI({ keepGamePaused: true }); // <-- não libera mais o jogo
           endGame(false);
           return;
         }
@@ -1184,13 +1210,15 @@ function startBossBattle(scene, phaseConfig, bossSprite, onComplete) {
     }
   }
 
-  function finishBossUI() {
+  function finishBossUI({ keepGamePaused = false } = {}) {
     clearInterval(timerInterval);
     clearInterval(typeInterval);
     questionEl.onclick = null;
-    GameData.paused = false;
-    scene.physics.resume();
-    scene.inputManager.setEnabled(true);
+    if (!keepGamePaused) {
+      GameData.paused = false;
+      scene.physics.resume();
+      scene.inputManager.setEnabled(true);
+    }
   }
 
   if (phaseConfig.boss.greeting) {
@@ -1213,14 +1241,13 @@ let infoTypeInterval = null;
 
 function typeInfoText(element, text) {
   clearInterval(infoTypeInterval);
-
   element.textContent = "";
-
   let charIndex = 0;
 
   infoTypeInterval = setInterval(() => {
     charIndex += 1;
     element.textContent = text.slice(0, charIndex);
+    playSfx(SFX.type);                          // <-- aqui
 
     if (charIndex >= text.length) {
       clearInterval(infoTypeInterval);
@@ -1495,21 +1522,15 @@ function startNarrative(scene, narrative, onComplete) {
       }
 
       currentCharIndex += 1;
-
-      textEl.textContent = currentText.slice(
-        0,
-        currentCharIndex
-      );
+      textEl.textContent = currentText.slice(0, currentCharIndex);
+      playSfx(SFX.type);                          // <-- aqui
 
       if (currentCharIndex >= currentText.length) {
         clearInterval(typeInterval);
         typeInterval = null;
-
         isTyping = false;
         currentDialogueFinished = true;
-
         continueEl.classList.add('visible');
-
         scheduleAutoAdvance();
       }
     }, NARRATIVE_TYPE_SPEED_MS);
@@ -2140,16 +2161,37 @@ document.querySelectorAll('.character-option').forEach((btn) => {
 
 document.getElementById('confirm-name-btn').addEventListener('click', () => {
   const name = nameInput.value.trim();
+
   if (!name) {
+    nameWarning.textContent = 'Digite seu nome antes de começar 🙂';
     nameWarning.classList.remove('hidden');
     nameInput.focus();
     return;
   }
+
+  const nameTaken = loadRanking().some(
+    (r) => r.name.trim().toLowerCase() === name.toLowerCase()
+  );
+  if (nameTaken) {
+    nameWarning.textContent = 'Esse nome já está no ranking! Escolha outro (ex: adicione um sobrenome).';
+    nameWarning.classList.remove('hidden');
+    nameInput.focus();
+    return;
+  }
+
+  // só chega aqui se o nome for válido e único
+  nameWarning.classList.add('hidden');
+  startBgm();
   GameData.playerName = name;
   resetGameData();
   updateHUD();
   document.getElementById('start-overlay').classList.add('hidden');
   game.scene.start('PhaseScene', { phaseIndex: 0 });
+});
+
+// Esconde o aviso assim que a pessoa começar a digitar de novo
+nameInput.addEventListener('input', () => {
+  nameWarning.classList.add('hidden');
 });
 
 // ---------------------------------------------------------
