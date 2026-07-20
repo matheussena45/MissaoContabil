@@ -988,9 +988,9 @@ function positionBossDialogue(scene, bossSprite) {
   let bottom = 540 - screenTopY + 26;
   const boxHeight = dialogueEl.offsetHeight;
   const maxBottom = 540 - 50 - boxHeight; // deixa folga maior no topo (o cronômetro ocupa esse canto)
-if (boxHeight > 0 && bottom > maxBottom) {
-  bottom = Math.max(maxBottom, 10);
-}
+  if (boxHeight > 0 && bottom > maxBottom) {
+    bottom = Math.max(maxBottom, 10);
+  }
   dialogueEl.style.bottom = `${bottom}px`;
 }
 

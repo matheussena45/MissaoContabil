@@ -809,7 +809,8 @@ button:hover {
   bottom: 24px;
   right: 24px;
   display: flex;
-  gap: 16px;         /* botões coladinhos um no outro, com um respiro pequeno */
+  gap: 16px;
+  /* botões coladinhos um no outro, com um respiro pequeno */
   z-index: 6;
   pointer-events: none;
 }
@@ -830,4 +831,7 @@ button:hover {
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
-.touch-btn:active { background: rgba(242, 169, 0, 0.35); }
+
+.touch-btn:active {
+  background: rgba(242, 169, 0, 0.35);
+}
