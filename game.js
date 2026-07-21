@@ -41,7 +41,7 @@ const SFX = {
 };
 SFX.bgm.loop = true;
 SFX.bgm.volume = 0.25; // volume moderado — não briga com os efeitos
-SFX.type.volume = 0.5;
+SFX.type.volume = 0.1;
 SFX.tick.volume = 0.6;
 
 function playSfx(audio) {
@@ -580,10 +580,10 @@ const PHASES = [
       { x: 1355, y: 210, text: 'A contabilidade não serve apenas para cumprir obrigações. Ela também ajuda a empresa a crescer com mais segurança.' },
     ],
     boss: {
-      name: 'Dona da JS',
+      name: 'Gerente da JS Grilo',
       portrait: { idle: 'boss3_idle.png', talk: 'boss3_talk.png' },
       portraitHeight: 100,
-      greeting: 'Seja bem-vindo à JS Grilo! Eu sou a responsável pelo escritório. Vamos ver o que você sabe sobre os temas mais avançados da contabilidade?',
+      greeting: 'Seja bem-vindo à JS Grilo! Eu me chamo Jéssica, a responsável pelo escritório. Vamos ver o que você sabe sobre os temas mais avançados da contabilidade?',
       introLines: ['Vamos à primeira:', 'Ótimo! Vamos pra próxima:', 'Última pergunta, força:'],
       correctLines: ['Isso mesmo, muito bem!', 'Perfeito!', 'Excelente resposta!'],
       wrongLines: ['Quase lá.', 'Essa é mais avançada, deixa eu explicar:', 'Vamos entender juntos:'],
@@ -1141,6 +1141,7 @@ function startBossBattle(scene, phaseConfig, bossSprite, onComplete) {
       if (isStale()) { clearInterval(timerInterval); return; }
       timeLeft -= 1;
       headerEl.textContent = `⏱ ${timeLeft}s`;
+      if (timeLeft <= 5 && timeLeft > 0) playSfx(SFX.tick);
       if (timeLeft <= 0) {
         clearInterval(timerInterval);
         resolveAnswer(null, q);
