@@ -42,7 +42,7 @@ const SFX = {
 SFX.bgm.loop = true;
 SFX.bgm.volume = 0.2; // volume moderado — não briga com os efeitos
 SFX.type.volume = 0.3;
-SFX.tick.volume = 0.9;
+SFX.tick.volume = 1.0;
 SFX.tick.loop = false;
 
 function playSfx(audio) {
