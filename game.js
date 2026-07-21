@@ -40,9 +40,9 @@ const SFX = {
   tick: new Audio('assets/audio/countdown_tick.wav'),
 };
 SFX.bgm.loop = true;
-SFX.bgm.volume = 0.25; // volume moderado — não briga com os efeitos
-SFX.type.volume = 0.1;
-SFX.tick.volume = 0.6;
+SFX.bgm.volume = 0.20; // volume moderado — não briga com os efeitos
+SFX.type.volume = 0.3;
+SFX.tick.volume = 0.8;
 
 function playSfx(audio) {
   try { audio.currentTime = 0; audio.play(); } catch (e) { /* ignora erro de autoplay */ }
