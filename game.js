@@ -41,7 +41,7 @@ const SFX = {
 };
 SFX.bgm.loop = true;
 SFX.bgm.volume = 0.2; // volume moderado — não briga com os efeitos
-SFX.type.volume = 0.3;
+SFX.type.volume = 0.03;
 SFX.tick.volume = 1.0;
 SFX.tick.loop = false;
 
@@ -313,7 +313,7 @@ const PHASES = [
     startDirection: "right",
     hasBoss: true,
     exitInitiallyOpen: false,
-    //objectiveHint: '⬅ Depois de falar com o gerente, volte e saia do Sebrae.',
+    objectiveHint: "⬅ Depois de falar com o gerente, volte e saia do Sebrae.",
     showExitArrow: true,
     exitDirection: "backward", // seta aponta pra trás (saindo da empresa)
     phaseNumber: 2,
@@ -357,7 +357,7 @@ const PHASES = [
       introLines: [
         "Vamos à primeira questão:",
         "Muito bem. Sigamos para a próxima:",
-        "Última questão — atenção redobrada aqui:",
+        "Última questão, atenção redobrada aqui:",
       ],
       correctLines: [
         "Correto. Você demonstra bom entendimento do assunto.",
