@@ -53,6 +53,13 @@ function playSfx(audio) {
     /* ignora erro de autoplay */
   }
 }
+
+function stopSfx(audio) {
+  try {
+    audio.pause();
+    audio.currentTime = 0;
+  } catch (e) { /* ignora erro */ }
+}
 function startBgm() {
   SFX.bgm.play().catch(() => {}); // navegadores só liberam áudio após interação do usuário
 }
@@ -1324,6 +1331,7 @@ function startBossBattle(scene, phaseConfig, bossSprite, onComplete) {
   // Etapa 3: boss reage (parabeniza ou explica o motivo do erro), depois avança
   function resolveAnswer(chosenIdx, q) {
     if (isStale()) return;
+    stopSfx(SFX.tick); // corta o áudio de contagem na hora — responder antes do tempo não deve deixar o som terminando sozinho
     const timedOut = chosenIdx === null;
     const isCorrect = !timedOut && chosenIdx === q.correct;
     answersPanelEl.classList.add("hidden");
