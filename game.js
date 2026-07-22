@@ -674,7 +674,7 @@ const PHASES = [
       portrait: { idle: "boss3_idle.png", talk: "boss3_talk.png" },
       portraitHeight: 100,
       greeting:
-        "Seja bem-vindo à JS Grilo! Eu me chamo Jéssica, a responsável pelo escritório. Vamos ver o que você sabe sobre os temas mais avançados da contabilidade?",
+        "Seja bem-vindo à JS Grilo! Eu me chamo Jaqueline, a responsável pelo escritório. Vamos ver o que você sabe sobre os temas mais avançados da contabilidade?",
       introLines: [
         "Vamos à primeira:",
         "Ótimo! Vamos pra próxima:",
