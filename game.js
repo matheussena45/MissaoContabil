@@ -58,7 +58,9 @@ function stopSfx(audio) {
   try {
     audio.pause();
     audio.currentTime = 0;
-  } catch (e) { /* ignora erro */ }
+  } catch (e) {
+    /* ignora erro */
+  }
 }
 function startBgm() {
   SFX.bgm.play().catch(() => {}); // navegadores só liberam áudio após interação do usuário

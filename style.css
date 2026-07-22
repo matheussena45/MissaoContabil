@@ -32,6 +32,10 @@ body {
   height: 100%;
   overflow: hidden;
   background: var(--color-primary-dark);
+  touch-action: manipulation; /* evita zoom por duplo-toque */
+  -webkit-user-select: none;
+  user-select: none; /* impede selecionar texto sem querer */
+  -webkit-touch-callout: none; /* impede menu de "salvar imagem" ao segurar o dedo */
 }
 
 body {
